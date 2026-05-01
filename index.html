@@ -4,61 +4,78 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dr_Duty</title>
+
 <style>
 body{
 margin:0;
 font-family:Arial;
-background:#0d0d0d;
-color:white;
+background:#07131f;
 display:flex;
 justify-content:center;
 align-items:center;
 height:100vh;
-}
-.box{
-width:340px;
-padding:25px;
-border-radius:25px;
-background:#151515;
-box-shadow:0 0 30px rgba(0,255,180,.25);
-text-align:center;
-}
-input{
-width:90%;
-padding:12px;
-margin:10px 0;
-border:none;
-border-radius:12px;
-font-size:18px;
-text-align:center;
-}
-button{
-padding:12px 25px;
-border:none;
-border-radius:12px;
-background:#00c896;
 color:white;
-font-size:18px;
+}
+
+.box{
+background:#0d1f33;
+padding:40px;
+border-radius:25px;
+width:320px;
+text-align:center;
+box-shadow:0 0 30px #00bfff;
+}
+
+h1{
+margin-bottom:30px;
+font-size:42px;
+}
+
+input{
+width:100%;
+padding:18px;
+border:none;
+border-radius:15px;
+font-size:22px;
+text-align:center;
+margin-bottom:20px;
+}
+
+button{
+width:100%;
+padding:18px;
+border:none;
+border-radius:15px;
+background:#00ff88;
+font-size:26px;
+font-weight:bold;
 cursor:pointer;
 }
-h1{margin-bottom:20px;}
+
+button:hover{
+background:#00cc66;
+}
 </style>
 </head>
+
 <body>
 
 <div class="box">
 <h1>Dr_Duty</h1>
+
 <input type="password" id="pass" placeholder="كلمة المرور">
-<br>
+
 <button onclick="login()">دخول</button>
 </div>
 
 <script>
 function login(){
-if(document.getElementById("pass").value=="11223344"){
-window.location="portal.html";
+let p=document.getElementById("pass").value;
+
+if(p=="11223344"){
+window.location.href="portal.html";
 }else{
-alert("كلمة المرور خاطئة");
+alert("كلمة المرور خطأ");
 }
 }
 </script>
