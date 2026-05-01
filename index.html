@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Dr_Duty</title>
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial;
+}
+
+body{
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+background:
+linear-gradient(rgba(10,40,80,.55),rgba(10,40,80,.55)),
+url('https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1400&q=80');
+background-size:cover;
+background-position:center;
+overflow:hidden;
+}
+
+body::before{
+content:"✚ ⚕ 🏥 ✚ ⚕";
+position:absolute;
+font-size:80px;
+opacity:.08;
+letter-spacing:40px;
+top:10%;
+left:5%;
+animation:move 12s linear infinite;
+white-space:nowrap;
+}
+
+@keyframes move{
+0%{transform:translateX(0)}
+100%{transform:translateX(120px)}
+}
+
+.box{
+width:360px;
+padding:35px;
+border-radius:28px;
+background:rgba(255,255,255,.18);
+backdrop-filter:blur(16px);
+box-shadow:0 10px 35px rgba(0,0,0,.35);
+border:1px solid rgba(255,255,255,.25);
+text-align:center;
+color:white;
+}
+
+.logo{
+font-size:48px;
+font-weight:bold;
+margin-bottom:10px;
+text-shadow:0 0 10px rgba(255,255,255,.4);
+}
+
+.sub{
+font-size:18px;
+margin-bottom:28px;
+opacity:.95;
+}
+
+input{
+width:100%;
+padding:16px;
+border:none;
+outline:none;
+border-radius:14px;
+font-size:20px;
+text-align:center;
+margin-bottom:18px;
+background:rgba(255,255,255,.85);
+}
+
+button{
+width:100%;
+padding:16px;
+border:none;
+border-radius:14px;
+font-size:24px;
+font-weight:bold;
+cursor:pointer;
+background:linear-gradient(90deg,#4facfe,#00f2fe);
+color:white;
+box-shadow:0 8px 20px rgba(0,0,0,.25);
+}
+
+button:active{
+transform:scale(.98);
+}
+
+.note{
+margin-top:16px;
+font-size:14px;
+opacity:.9;
+}
+</style>
+</head>
+
+<body>
+
+<div class="box">
+<div class="logo">Dr_Duty</div>
+<div class="sub">Medical On-Call Portal</div>
+
+<input type="password" id="pass" placeholder="كلمة المرور">
+
+<button onclick="login()">دخول</button>
+
+<div class="note">Authorized Doctors Only</div>
+</div>
+
+<script>
+function login(){
+let p=document.getElementById("pass").value;
+
+if(p=="11223344"){
+window.location.href="portal.html";
+}else{
+alert("كلمة المرور غير صحيحة");
+}
+}
+</script>
+
+</body>
+</html>
