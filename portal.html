@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dr_Duty Portal</title>
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+background:url('https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&w=1400&q=80') no-repeat center center/cover;
+}
+
+.overlay{
+position:absolute;
+width:100%;
+height:100%;
+background:rgba(0,0,0,.35);
+}
+
+.card{
+position:relative;
+z-index:2;
+width:460px;
+padding:30px;
+border-radius:28px;
+background:rgba(10,30,60,.55);
+backdrop-filter:blur(10px);
+box-shadow:0 0 28px #00bfff;
+text-align:center;
+color:white;
+}
+
+.top1{
+font-size:34px;
+font-weight:bold;
+margin-bottom:8px;
+}
+
+.top2{
+font-size:20px;
+color:#9ffcff;
+margin-bottom:18px;
+}
+
+.logo{
+font-size:58px;
+font-weight:bold;
+margin-bottom:20px;
+}
+
+.spec{
+font-size:34px;
+font-weight:bold;
+color:#56ffff;
+margin-bottom:18px;
+}
+
+.doc{
+font-size:24px;
+margin-bottom:10px;
+}
+
+.phone{
+font-size:22px;
+margin-bottom:25px;
+}
+
+.btn{
+display:block;
+width:100%;
+padding:18px;
+margin-top:14px;
+border-radius:16px;
+text-decoration:none;
+font-size:28px;
+font-weight:bold;
+color:white;
+}
+
+.call{
+background:linear-gradient(90deg,#0055ff,#00d9ff);
+}
+
+.whats{
+background:#19e600;
+}
+
+.date{
+margin-top:20px;
+font-size:18px;
+opacity:.9;
+}
+</style>
+</head>
+
+<body>
+
+<div class="overlay"></div>
+
+<div class="card">
+
+<div class="top1">مستشفى الموانئ العام</div>
+<div class="top2">Al-Mawani General Hospital</div>
+
+<div class="logo">Dr_Duty</div>
+
+<div class="spec" id="specialtyName">Emergency Medicine</div>
+
+<div class="doc">Dr. Mohammed Naser</div>
+
+<div class="phone" id="phoneText">9647805871273</div>
+
+<a class="btn call" id="callBtn" href="tel:9647805871273">📞 Call</a>
+
+<a class="btn whats" id="waBtn" href="https://wa.me/9647805871273">💬 WhatsApp</a>
+
+<div class="date" id="today"></div>
+
+</div>
+
+<script>
+const params = new URLSearchParams(window.location.search);
+
+const spec = params.get("spec");
+if(spec){
+document.getElementById("specialtyName").innerText = spec;
+}
+
+const now = new Date();
+document.getElementById("today").innerText =
+"Updated: " +
+now.getDate().toString().padStart(2,'0') + "/" +
+(now.getMonth()+1).toString().padStart(2,'0') + "/" +
+now.getFullYear();
+</script>
+
+</body>
+</html>
