@@ -1,15 +1,143 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+<title>Dr Duty Portal</title>
+
+<style>
+body{
+margin:0;
+padding:0;
+font-family:Arial;
+background:url('https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&w=1200&q=80');
+background-size:cover;
+background-position:center;
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+}
+
+.overlay{
+position:fixed;
+inset:0;
+background:rgba(0,0,0,0.45);
+backdrop-filter:blur(4px);
+}
+
+.card{
+position:relative;
+z-index:2;
+width:90%;
+max-width:650px;
+background:rgba(20,20,30,0.55);
+padding:30px;
+border-radius:30px;
+text-align:center;
+color:#fff;
+box-shadow:0 0 30px #00d9ff55;
+}
+
+#hospitalAr{
+font-size:46px;
+font-weight:bold;
+margin-bottom:10px;
+}
+
+#hospitalEn{
+font-size:24px;
+color:#9ff8ff;
+margin-bottom:25px;
+}
+
+#mainTitle{
+font-size:72px;
+font-weight:bold;
+margin-bottom:10px;
+}
+
+#specialtyName{
+font-size:48px;
+color:#35f3ff;
+font-weight:bold;
+margin-bottom:20px;
+}
+
+#doctorName{
+font-size:34px;
+margin-bottom:10px;
+}
+
+#phone{
+font-size:28px;
+margin-bottom:25px;
+}
+
+.btn{
+display:block;
+text-decoration:none;
+padding:18px;
+border-radius:18px;
+font-size:34px;
+font-weight:bold;
+margin:15px 0;
+color:#fff;
+}
+
+.call{
+background:linear-gradient(90deg,#004cff,#1ad9ff);
+}
+
+.whats{
+background:#20f000;
+}
+
+.date{
+margin-top:20px;
+font-size:22px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="overlay"></div>
+
+<div class="card">
+
+<div id="hospitalAr">جاري التحميل...</div>
+<div id="hospitalEn"></div>
+
+<div id="mainTitle">Dr_Duty</div>
+
+<div id="specialtyName">Loading...</div>
+
+<div id="doctorName"></div>
+
+<div id="phone"></div>
+
+<a class="btn call" id="callBtn" href="#">📞 Call</a>
+
+<a class="btn whats" id="waBtn" href="#">💬 WhatsApp</a>
+
+<div class="date" id="today"></div>
+
+</div>
+
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDQqQpACfdiq-i1q-hv9auGjEkSeHhMIuc",
-  authDomain: "dr-duty.firebaseapp.com",
-  projectId: "dr-duty",
-  storageBucket: "dr-duty.firebasestorage.app",
-  messagingSenderId: "1051471488231",
-  appId: "1:1051471488231:web:d9abfafee31373ec826e42"
+apiKey: "AIzaSyDQqQpACfdiq-i1q-hv9auGjEkSeHhMIuc",
+authDomain: "dr-duty.firebaseapp.com",
+projectId: "dr-duty",
+storageBucket: "dr-duty.firebasestorage.app",
+messagingSenderId: "1051471488231",
+appId: "1:1051471488231:web:d9abfafee31373ec826e42"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -20,60 +148,46 @@ const spec = params.get("spec") || "Emergency";
 
 document.getElementById("specialtyName").innerText = spec;
 
-async function loadDuty() {
+async function loadDuty(){
 
-  try {
+try{
 
-    const ref = doc(db, "Duties", spec);
-    const snap = await getDoc(ref);
+const ref = doc(db,"Duties",spec);
+const snap = await getDoc(ref);
 
-    if (snap.exists()) {
+if(snap.exists()){
 
-      const data = snap.data();
+const data = snap.data();
 
-      document.getElementById("hospitalAr").innerText =
-        data.hospitalAr || "مستشفى غير معروف";
+document.getElementById("hospitalAr").innerText = data.hospitalAr || "";
+document.getElementById("hospitalEn").innerText = data.hospitalEn || "";
+document.getElementById("doctorName").innerText = data["Doctor Name"] || "";
+document.getElementById("phone").innerText = data.phone || "";
 
-      document.getElementById("hospitalEn").innerText =
-        data.hospitalEn || "";
+document.getElementById("callBtn").href = "tel:" + data.phone;
+document.getElementById("waBtn").href = "https://wa.me/" + data.whatsapp;
 
-      document.getElementById("doctorName").innerText =
-        data["Doctor Name"] || "";
+}
 
-      document.getElementById("phone").innerText =
-        data.phone || "";
+}catch(e){
 
-      document.getElementById("callBtn").href =
-        "tel:" + (data.phone || "");
+document.getElementById("hospitalAr").innerText="خطأ بالاتصال";
 
-      document.getElementById("waBtn").href =
-        "https://wa.me/" + (data.whatsapp || "");
-
-    } else {
-
-      document.getElementById("hospitalAr").innerText = "لا توجد بيانات";
-      document.getElementById("doctorName").innerText = "";
-      document.getElementById("phone").innerText = "";
-
-    }
-
-  } catch(error) {
-
-    document.getElementById("hospitalAr").innerText = "خطأ بالاتصال";
-    console.log(error);
-
-  }
+}
 
 }
 
 loadDuty();
 
-const now = new Date();
+const now=new Date();
 
 document.getElementById("today").innerText =
-"Updated: " +
-now.getDate() + "/" +
-(now.getMonth()+1) + "/" +
-now.getFullYear();
+"Updated: "
++ now.getDate()+"/"
++ (now.getMonth()+1)+"/"
++ now.getFullYear();
 
 </script>
+
+</body>
+</html>
