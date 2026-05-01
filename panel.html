@@ -4,34 +4,46 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>panel.html</title>
+
 <style>
 body{margin:0;font-family:Arial;background:#081a35;color:#fff;padding:20px}
-.box{max-width:800px;margin:auto;background:#10284f;padding:20px;border-radius:20px}
+.box{max-width:900px;margin:auto;background:#10284f;padding:20px;border-radius:20px}
 .card{background:#173764;padding:18px;border-radius:18px;margin-top:15px}
 input,select,button{width:100%;padding:14px;margin:8px 0;border:none;border-radius:10px;font-size:17px}
 button{background:#2563eb;color:#fff}
 .red{background:#dc2626}
+.orange{background:#ea580c}
+.green{background:#16a34a}
+small{color:#ddd}
 </style>
 </head>
+
 <body>
+
 <script>
 if(localStorage.getItem("role")!="admin"){location.href="admin.html";}
 </script>
 
 <div class="box">
+
 <h1>Admin Panel</h1>
 
 <div class="card">
-<h2>Add Hospital</h2>
+<h2>Hospitals</h2>
+
 <input id="hospitalInput" placeholder="Hospital Name">
-<button onclick="addHospital()">Save Hospital</button>
+<button onclick="addHospital()">Add Hospital</button>
+
 <select id="hospitalList"></select>
+
 <button class="red" onclick="deleteHospital()">Delete Selected Hospital</button>
 </div>
 
 <div class="card">
-<h2>Add / Edit Doctor</h2>
+<h2>Doctors</h2>
+
 <select id="doctorSelect" onchange="loadDoctor()"></select>
+
 <input id="docName" placeholder="Doctor Name">
 <input id="docPhone" placeholder="Phone Number">
 
@@ -78,19 +90,37 @@ if(localStorage.getItem("role")!="admin"){location.href="admin.html";}
 </div>
 
 <div class="card">
-<h2>Add Assistant</h2>
+<h2>Assistants</h2>
+
 <input id="aUser" placeholder="Username">
 <input id="aPass" placeholder="Password">
-<button onclick="addAssistant()">Save Assistant</button>
+
+<button onclick="addAssistant()">Add Assistant</button>
+
+<button class="green" onclick="quickAssistant()">Generate Assistant</button>
+
+<select id="assistantList" onchange="loadAssistant()"></select>
+
+<input id="editPass" placeholder="New Password">
+
+<button class="orange" onclick="changeAssistantPass()">Change Password</button>
+
+<button class="red" onclick="deleteAssistant()">Delete Assistant</button>
+
+<button class="red" onclick="disableAssistant()">Disable / Enable Assistant</button>
+
+<small id="assistInfo"></small>
 </div>
 
 <button class="red" onclick="logout()">Logout</button>
+
 </div>
 
 <script>
 function getData(k){return JSON.parse(localStorage.getItem(k)||"[]")}
 function setData(k,v){localStorage.setItem(k,JSON.stringify(v))}
 
+/* hospitals */
 function loadHospitals(){
 let arr=getData("hospitals");
 hospitalList.innerHTML="";
@@ -100,7 +130,6 @@ hospitalList.innerHTML+=<option>${x}</option>;
 docHospital.innerHTML+=<option>${x}</option>;
 });
 }
-
 function addHospital(){
 let v=hospitalInput.value.trim();
 if(v=="")return;
@@ -110,14 +139,13 @@ setData("hospitals",arr);
 hospitalInput.value="";
 loadHospitals();
 }
-
 function deleteHospital(){
-let arr=getData("hospitals");
-arr=arr.filter(x=>x!=hospitalList.value);
+let arr=getData("hospitals").filter(x=>x!=hospitalList.value);
 setData("hospitals",arr);
 loadHospitals();
 }
 
+/* doctors */
 function loadDoctors(){
 let arr=getData("doctors");
 doctorSelect.innerHTML="<option>Select Doctor</option>";
@@ -125,7 +153,6 @@ arr.forEach(x=>{
 doctorSelect.innerHTML+=<option>${x.name}</option>;
 });
 }
-
 function saveDoctor(){
 let arr=getData("doctors");
 let obj={
@@ -134,13 +161,12 @@ phone:docPhone.value,
 spec:docSpec.value,
 hospital:docHospital.value
 };
-arr=arr.filter(x=>x.name!=obj.name);
+arr=arr.filter(x=>x.name!=doctorSelect.value && x.name!=obj.name);
 arr.push(obj);
 setData("doctors",arr);
 loadDoctors();
 alert("Saved");
 }
-
 function loadDoctor(){
 let arr=getData("doctors");
 let d=arr.find(x=>x.name==doctorSelect.value);
@@ -150,3 +176,90 @@ docPhone.value=d.phone;
 docSpec.value=d.spec;
 docHospital.value=d.hospital;
 }
+function deleteDoctor(){
+let arr=getData("doctors").filter(x=>x.name!=doctorSelect.value);
+setData("doctors",arr);
+loadDoctors();
+}
+
+/* assistants */
+function loadAssistants(){
+let arr=getData("assistants");
+assistantList.innerHTML="<option>Select Assistant</option>";
+arr.forEach(x=>{
+assistantList.innerHTML+=<option>${x.user}</option>;
+});
+assistInfo.innerHTML="Total Assistants: "+arr.length;
+}
+function addAssistant(){
+let arr=getData("assistants");
+arr.push({
+user:aUser.value,
+pass:aPass.value,
+disabled:false
+});
+setData("assistants",arr);
+aUser.value="";
+aPass.value="";
+loadAssistants();
+alert("Assistant Added");
+}
+function quickAssistant(){
+let arr=getData("assistants");
+let num=arr.length+1;
+arr.push({
+user:"assistant"+num,
+pass:"1234",
+disabled:false
+});
+setData("assistants",arr);
+loadAssistants();
+alert("Created: assistant"+num+" / 1234");
+}
+function loadAssistant(){
+let arr=getData("assistants");
+let d=arr.find(x=>x.user==assistantList.value);
+if(!d)return;
+editPass.value=d.pass;
+assistInfo.innerHTML="Status: "+(d.disabled?"Disabled":"Active");
+}
+function changeAssistantPass(){
+let arr=getData("assistants");
+arr.forEach(x=>{
+if(x.user==assistantList.value){x.pass=editPass.value;}
+});
+setData("assistants",arr);
+loadAssistants();
+alert("Password Changed");
+}
+function deleteAssistant(){
+let arr=getData("assistants").filter(x=>x.user!=assistantList.value);
+setData("assistants",arr);
+loadAssistants();
+alert("Deleted");
+}
+function disableAssistant(){
+let arr=getData("assistants");
+arr.forEach(x=>{
+if(x.user==assistantList.value){
+x.disabled=!x.disabled;
+}
+});
+setData("assistants",arr);
+loadAssistants();
+alert("Updated");
+}
+
+/* logout */
+function logout(){
+localStorage.removeItem("role");
+location.href="admin.html";
+}
+
+loadHospitals();
+loadDoctors();
+loadAssistants();
+</script>
+
+</body>
+</html>
