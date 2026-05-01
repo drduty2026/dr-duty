@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Dr Duty QR Codes</title>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
 <style>
@@ -12,87 +11,60 @@ body{
 margin:0;
 padding:30px;
 font-family:Arial;
-background:#0a0f1f;
-color:white;
+background:#081226;
+color:#fff;
 text-align:center;
 }
-
-h1{
-font-size:52px;
-margin-bottom:10px;
-}
-
-p{
+h1{font-size:56px;margin-bottom:10px;}
+p{font-size:22px;color:#aaa;margin-bottom:30px;}
+.topbtn{
+background:#2563eb;
+color:white;
+border:none;
+padding:15px 28px;
 font-size:22px;
-color:#aaa;
+border-radius:18px;
+font-weight:bold;
 margin-bottom:30px;
 }
-
 .grid{
 display:grid;
 grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
-gap:25px;
+gap:22px;
 }
-
 .card{
-background:white;
-color:black;
-padding:20px;
+background:#fff;
+color:#000;
+padding:18px;
 border-radius:18px;
-box-shadow:0 10px 30px rgba(0,0,0,.25);
 }
-
 .name{
 font-size:22px;
-font-weight:700;
-margin-bottom:15px;
+font-weight:bold;
+margin-bottom:12px;
 }
-
 .qr{
 display:flex;
 justify-content:center;
-margin-bottom:15px;
-}
-
-.url{
-font-size:12px;
-word-break:break-all;
-color:#666;
 margin-bottom:10px;
 }
-
-button{
-margin:6px;
-padding:10px 16px;
-border:none;
-border-radius:12px;
+.dbtn{
 background:#16a34a;
-color:white;
-font-size:15px;
+color:#fff;
+border:none;
+padding:10px 18px;
+border-radius:12px;
+font-size:16px;
 font-weight:bold;
-cursor:pointer;
+margin-top:10px;
 }
-
-.topbtn{
-background:#2563eb;
-padding:14px 24px;
-font-size:18px;
-margin-bottom:30px;
-}
-
 @media print{
-button{display:none;}
-body{
-background:white;
-color:black;
-}
-h1,p{
-color:black;
-}
+.topbtn,.dbtn{display:none;}
+body{background:#fff;color:#000;}
+p{color:#000;}
 }
 </style>
 </head>
-
 <body>
 
 <h1>Dr Duty QR Codes</h1>
@@ -103,82 +75,49 @@ color:black;
 <div class="grid" id="grid"></div>
 
 <script>
-
-const departments=[
-"Emergency Medicine",
-"Surgery",
-"Internal Medicine",
-"Pediatrics",
-"Cardiology",
-"Orthopedic",
-"Neurology",
-"ENT",
-"Ophthalmology",
-"Dermatology",
-"Radiology",
-"Urology",
-"Nephrology",
-"Oncology",
-"Psychiatry",
-"Dental",
-"Family Medicine",
-"Pulmonary",
-"Gastroenterology",
-"Endocrinology",
-"Rheumatology",
-"Hematology",
-"Infectious Disease",
-"Plastic Surgery",
-"Neurosurgery",
-"Vascular Surgery",
-"Thoracic Surgery",
-"Gynecology",
-"Obstetrics",
-"Pathology",
-"Laboratory",
-"ICU",
-"Anesthesia"
+const departments = [
+"Emergency Medicine","Surgery","Internal Medicine","Pediatrics","Cardiology",
+"Orthopedic","Neurology","ENT","Ophthalmology","Dermatology",
+"Radiology","Urology","Nephrology","Oncology","Psychiatry",
+"Dental","Family Medicine","Pulmonary","Gastroenterology","Endocrinology",
+"Rheumatology","Hematology","Infectious Disease","Plastic Surgery","Neurosurgery",
+"Vascular Surgery","Thoracic Surgery","Gynecology","Obstetrics","Pathology",
+"Laboratory","ICU","Anesthesia"
 ];
 
 const base="https://drduty2026.github.io/dr-duty/portal.html?spec=";
-
 const grid=document.getElementById("grid");
 
 departments.forEach(dep=>{
+let id=dep.replace(/\s/g,'');
+let url=base+encodeURIComponent(dep);
 
-const clean=dep.replace(/\s/g,'');
-
-const url=base+encodeURIComponent(dep);
-
-const card=document.createElement("div");
+let card=document.createElement("div");
 card.className="card";
 
 card.innerHTML=
 <div class="name">${dep}</div>
-<div class="qr" id="qr${clean}"></div>
-<div class="url">${url}</div>
-<button onclick="downloadQR('qr${clean}','${dep}')">Download PNG</button>
+<div class="qr" id="qr${id}"></div>
+<button class="dbtn" onclick="downloadQR('qr${id}','${dep}')">Download PNG</button>
 ;
 
 grid.appendChild(card);
 
-new QRCode(document.getElementById("qr"+clean),{
+new QRCode(document.getElementById("qr"+id),{
 text:url,
 width:180,
 height:180
 });
-
 });
 
 function downloadQR(id,name){
-const canvas=document.querySelector("#"+id+" canvas");
+let canvas=document.querySelector("#"+id+" canvas");
 if(!canvas)return;
-const link=document.createElement("a");
-link.download=name+".png";
-link.href=canvas.toDataURL("image/png");
-link.click();
+let a=document.createElement("a");
+a.href=canvas.toDataURL("image/png");
+a.download=name+".png";
+a.click();
 }
-
 </script>
 
 </body>
