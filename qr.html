@@ -3,121 +3,94 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Dr Duty QR Master</title>
+<title>Dr Duty QR Print</title>
 
 <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 <style>
 body{
 margin:0;
-padding:25px;
+padding:20px;
 font-family:Arial,Helvetica,sans-serif;
-background:#07111f;
-color:white;
+background:white;
+color:black;
 text-align:center;
 }
 
 h1{
-font-size:42px;
-margin-bottom:10px;
+font-size:34px;
+margin-bottom:8px;
 }
 
 .sub{
-opacity:.8;
+font-size:16px;
 margin-bottom:25px;
-font-size:18px;
-}
-
-.topBtns{
-margin-bottom:30px;
-}
-
-button{
-border:none;
-padding:16px 26px;
-font-size:20px;
-font-weight:bold;
-border-radius:14px;
-cursor:pointer;
-margin:8px;
-color:white;
-}
-
-.pdf{
-background:linear-gradient(90deg,#0057ff,#18d8ff);
-}
-
-.print{
-background:#18b400;
+color:#555;
 }
 
 .grid{
 display:grid;
-grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
-gap:22px;
+grid-template-columns:repeat(3,1fr);
+gap:15px;
 }
 
 .card{
-background:white;
-color:black;
-border-radius:18px;
-padding:18px;
-box-shadow:0 0 15px rgba(0,255,255,.15);
+border:1px solid #ddd;
+padding:12px;
+border-radius:12px;
 page-break-inside:avoid;
 }
 
-.logo{
-font-size:22px;
+.title{
+font-size:18px;
 font-weight:bold;
-margin-bottom:8px;
-color:#005eff;
-}
-
-.dep{
-font-size:22px;
-font-weight:bold;
-margin-bottom:14px;
+margin-bottom:10px;
 }
 
 canvas{
-background:white;
-padding:8px;
-border-radius:10px;
+width:100%;
+height:auto;
 }
 
 .small{
-margin-top:10px;
-font-size:13px;
+font-size:11px;
+margin-top:6px;
 word-break:break-word;
-opacity:.7;
+color:#666;
+}
+
+@media(max-width:900px){
+.grid{
+grid-template-columns:repeat(2,1fr);
+}
+}
+
+@media(max-width:600px){
+.grid{
+grid-template-columns:1fr;
+}
 }
 
 @media print{
-button,.topBtns,.sub{
-display:none;
-}
 body{
-background:white;
+padding:8px;
+}
+h1,.sub{
+margin:5px;
 }
 }
 </style>
 </head>
 <body>
 
-<h1>Dr Duty QR Master</h1>
-<div class="sub">All Departments • Ready For Print • PDF Export</div>
-
-<div class="topBtns">
-<button class="pdf" onclick="savePDF()">Download PDF</button>
-<button class="print" onclick="window.print()">Print</button>
-</div>
+<h1>Dr Duty QR Codes</h1>
+<div class="sub">Use Chrome → Print → Save as PDF</div>
 
 <div class="grid" id="grid"></div>
 
 <script>
 
-const departments = [
+const deps = [
 
 "Emergency Medicine",
 "Internal Medicine",
@@ -138,20 +111,7 @@ const departments = [
 "Oncology",
 "ICU",
 "Family Medicine",
-"Dental",
-"Burn Unit",
-"Plastic Surgery",
-"Neurosurgery",
-"Pulmonology",
-"Gastroenterology",
-"Endocrinology",
-"Hematology",
-"Infectious Disease",
-"Rheumatology",
-"Trauma",
-"NICU",
-"CCU",
-"Dialysis"
+"Dental"
 
 ];
 
@@ -160,7 +120,7 @@ const base =
 
 const grid = document.getElementById("grid");
 
-departments.forEach(dep=>{
+deps.forEach(dep=>{
 
 const url = base + encodeURIComponent(dep);
 
@@ -168,10 +128,9 @@ const card = document.createElement("div");
 card.className = "card";
 
 card.innerHTML = 
-<div class="logo">Dr Duty</div>
-<div class="dep">${dep}</div>
+<div class="title">${dep}</div>
 <canvas></canvas>
-<div class="small">${url}</div>
+<div class="small">Dr Duty</div>
 ;
 
 grid.appendChild(card);
@@ -186,24 +145,6 @@ margin:1
 );
 
 });
-
-function savePDF(){
-
-const element = document.body;
-
-html2pdf().set({
-margin:0.3,
-filename:"Dr_Duty_QR_Codes.pdf",
-image:{type:"jpeg",quality:1},
-html2canvas:{scale:2},
-jsPDF:{
-unit:"in",
-format:"a4",
-orientation:"portrait"
-}
-}).from(element).save();
-
-}
 
 </script>
 
