@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Dr_Duty Portal</title>
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial;
+}
+
+body{
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+background:
+linear-gradient(rgba(5,25,45,.65),rgba(5,25,45,.65)),
+url('https://images.unsplash.com/photo-1586773860418-d37222d8fce3?auto=format&fit=crop&w=1400&q=80');
+background-size:cover;
+background-position:center;
+color:white;
+}
+
+.card{
+width:380px;
+padding:32px;
+border-radius:28px;
+background:rgba(255,255,255,.15);
+backdrop-filter:blur(16px);
+border:1px solid rgba(255,255,255,.22);
+box-shadow:0 12px 35px rgba(0,0,0,.35);
+text-align:center;
+animation:fade .7s ease;
+}
+
+@keyframes fade{
+from{opacity:0;transform:translateY(20px)}
+to{opacity:1;transform:translateY(0)}
+}
+
+.hospital{
+font-size:20px;
+font-weight:bold;
+margin-bottom:6px;
+color:#cfefff;
+}
+
+.eng{
+font-size:14px;
+opacity:.9;
+margin-bottom:18px;
+}
+
+.logo{
+font-size:36px;
+font-weight:bold;
+margin-bottom:18px;
+color:#ffffff;
+}
+
+.spec{
+font-size:28px;
+font-weight:bold;
+color:#69e7ff;
+margin-bottom:14px;
+}
+
+.name{
+font-size:26px;
+margin-bottom:14px;
+}
+
+.phone{
+font-size:24px;
+margin-bottom:20px;
+letter-spacing:1px;
+}
+
+.btn{
+display:block;
+width:100%;
+padding:16px;
+border:none;
+border-radius:16px;
+text-decoration:none;
+font-size:22px;
+font-weight:bold;
+margin-top:12px;
+color:white;
+}
+
+.call{
+background:linear-gradient(90deg,#1e90ff,#00bfff);
+}
+
+.wa{
+background:linear-gradient(90deg,#00c853,#25D366);
+}
+
+.update{
+margin-top:18px;
+font-size:14px;
+opacity:.9;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+
+<div class="hospital">مستشفى الموانى العام</div>
+<div class="eng">Al-Mawani General Hospital</div>
+
+<div class="logo">Dr_Duty</div>
+
+<div class="spec">Emergency Medicine</div>
+
+<div class="name">Dr. Mohammed Naser</div>
+
+<div class="phone">9647805871273</div>
+
+<a class="btn call" href="tel:+9647805871273">📞 Call</a>
+
+<a class="btn wa" href="https://wa.me/9647805871273">💬 WhatsApp</a>
+
+<div class="update" id="time"></div>
+
+</div>
+
+<script>
+document.getElementById("time").innerHTML =
+"Updated: " + new Date().toLocaleString();
+</script>
+
+</body>
+</html>
