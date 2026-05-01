@@ -5,121 +5,157 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Dr Duty QR Codes</title>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
 <style>
 body{
 margin:0;
-padding:20px;
-font-family:Arial,Helvetica,sans-serif;
+padding:30px;
+font-family:Arial;
 background:#ffffff;
 text-align:center;
-color:#000;
 }
 
 h1{
-font-size:34px;
-margin-bottom:8px;
+font-size:42px;
+margin-bottom:10px;
 }
 
-.sub{
-font-size:16px;
-color:#666;
-margin-bottom:25px;
+p{
+font-size:22px;
+color:#555;
+margin-bottom:30px;
 }
 
 .grid{
 display:grid;
-grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-gap:15px;
+grid-template-columns:repeat(3,1fr);
+gap:25px;
+max-width:1200px;
+margin:auto;
 }
 
 .card{
-border:1px solid #ddd;
-border-radius:12px;
-padding:12px;
+border:2px solid #ddd;
+padding:15px;
+border-radius:16px;
 background:#fff;
 }
 
-.title{
-font-size:18px;
+.name{
+font-size:22px;
 font-weight:bold;
 margin-bottom:10px;
 }
 
-img{
+.qr{
 width:180px;
 height:180px;
-object-fit:contain;
+margin:auto;
 }
 
-.small{
-font-size:11px;
-margin-top:8px;
+.url{
+font-size:13px;
+margin-top:10px;
+word-break:break-all;
 color:#666;
-word-break:break-word;
+}
+
+.printBtn{
+margin-top:30px;
+padding:18px 45px;
+font-size:24px;
+border:none;
+border-radius:16px;
+background:#00bfff;
+color:#fff;
+font-weight:bold;
+cursor:pointer;
 }
 
 @media print{
-body{padding:8px;}
+.printBtn,p{
+display:none;
 }
+body{
+padding:10px;
+}
+}
+
 </style>
 </head>
+
 <body>
 
 <h1>Dr Duty QR Codes</h1>
-<div class="sub">Chrome → Print → Save as PDF</div>
+<p>Print or Save as PDF</p>
 
 <div class="grid" id="grid"></div>
 
+<button class="printBtn" onclick="window.print()">Print / PDF</button>
+
 <script>
 
-const deps = [
-
+const departments = [
 "Emergency Medicine",
 "Internal Medicine",
 "Surgery",
 "Pediatrics",
+"Gynecology",
 "Orthopedics",
 "Cardiology",
+"Dermatology",
 "Neurology",
-"Nephrology",
 "ENT",
 "Ophthalmology",
-"Dermatology",
-"Psychiatry",
 "Radiology",
-"Anesthesia",
 "Urology",
-"Gynecology",
+"Anesthesia",
+"Psychiatry",
 "Oncology",
-"ICU",
+"Nephrology",
+"Gastroenterology",
+"Pulmonology",
+"Endocrinology",
+"Rheumatology",
+"Infectious Disease",
+"Hematology",
+"Plastic Surgery",
+"Vascular Surgery",
 "Family Medicine",
-"Dental"
-
+"ICU",
+"CCU",
+"Burn Unit",
+"Neurosurgery",
+"Maxillofacial",
+"Pathology",
+"Laboratory"
 ];
 
-const base =
-"https://drduty2026.github.io/dr-duty/portal.html?spec=";
+const base="https://drduty2026.github.io/dr-duty/portal.html?spec=";
 
-const grid = document.getElementById("grid");
+const grid=document.getElementById("grid");
 
-deps.forEach(dep=>{
+departments.forEach((dep,i)=>{
 
-const url = base + encodeURIComponent(dep);
+let url=base+encodeURIComponent(dep);
 
-const qr =
-"https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=" +
-encodeURIComponent(url);
+let card=document.createElement("div");
+card.className="card";
 
-const card = document.createElement("div");
-card.className = "card";
-
-card.innerHTML = 
-<div class="title">${dep}</div>
-<img src="${qr}">
-<div class="small">Dr Duty</div>
+card.innerHTML=
+<div class="name">${dep}</div>
+<div class="qr" id="q${i}"></div>
+<div class="url">${url}</div>
 ;
 
 grid.appendChild(card);
+
+new QRCode(document.getElementById("q"+i),{
+text:url,
+width:180,
+height:180
+});
 
 });
 
