@@ -8,10 +8,10 @@
 <style>
 body{
 margin:0;
+padding:20px;
 font-family:Arial;
 background:#081226;
 color:white;
-padding:20px;
 }
 .box{
 max-width:900px;
@@ -19,44 +19,38 @@ margin:auto;
 background:#10203a;
 padding:25px;
 border-radius:20px;
-box-shadow:0 0 25px rgba(0,0,0,.35);
 }
-h1{
-margin-top:0;
+h1,h2,h3{
 text-align:center;
 }
 input,select{
 width:100%;
 padding:12px;
-margin:7px 0;
+margin:8px 0;
 border:none;
 border-radius:10px;
 font-size:16px;
 }
 button{
+width:100%;
+padding:12px;
+margin-top:8px;
 background:#2563eb;
 color:white;
 border:none;
-padding:12px 18px;
 border-radius:10px;
 font-size:16px;
 cursor:pointer;
-margin-top:10px;
-}
-button:hover{opacity:.9}
-.row{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:12px;
 }
 .card{
 background:#17304f;
 padding:15px;
 border-radius:15px;
-margin-top:12px;
+margin-top:15px;
 }
-.hide{display:none}
-small{color:#aaa}
+.hide{
+display:none;
+}
 </style>
 </head>
 <body>
@@ -66,9 +60,12 @@ small{color:#aaa}
 <h1>Dr Duty Control Panel</h1>
 
 <div id="loginBox">
+
 <input id="user" placeholder="Username">
 <input id="pass" type="password" placeholder="Password">
+
 <button onclick="login()">Login</button>
+
 </div>
 
 <div id="panel" class="hide">
@@ -76,32 +73,50 @@ small{color:#aaa}
 <h2 id="welcome"></h2>
 
 <div class="card">
-<h3>Hospital Name</h3>
-<input id="hospitalName">
-<button onclick="saveHospital()">Save</button>
+
+<h3>Add Hospital</h3>
+
+<select id="hospitalName"></select>
+
+<input id="newHospital" placeholder="New Hospital Name">
+
+<button onclick="addHospital()">Add Hospital</button>
+
 </div>
 
 <div class="card">
+
 <h3>Add / Edit Doctor</h3>
 
+<select id="doctorList" onchange="loadDoctor()"></select>
+
 <input id="docName" placeholder="Doctor Name">
-<input id="docSpec" placeholder="Specialty">
+
 <input id="docPhone" placeholder="Phone Number">
 
+<select id="docSpec"></select>
+
+<select id="doctorHospital"></select>
+
 <button onclick="saveDoctor()">Save Doctor</button>
+
 </div>
 
 <div class="card" id="usersBox">
-<h3>Main Admin Only - Users</h3>
+
+<h3>Main Admin Only</h3>
 
 <input id="newUser" placeholder="Username">
+
 <input id="newPass" placeholder="Password">
+
 <select id="newRole">
 <option value="editor">Editor</option>
 <option value="admin">Admin</option>
 </select>
 
 <button onclick="saveUser()">Create User</button>
+
 </div>
 
 <button onclick="logout()">Logout</button>
@@ -117,27 +132,44 @@ import {
 getFirestore,
 doc,
 setDoc,
-getDoc
+getDoc,
+collection,
+getDocs
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
-apiKey: "AIzaSyDQqQpACfdiq-i1q-hv9auGjEkSeHhMIuc",
-authDomain: "dr-duty.firebaseapp.com",
-projectId: "dr-duty",
-storageBucket: "dr-duty.firebasestorage.app",
-messagingSenderId: "1051471488231",
-appId: "1:1051471488231:web:d9abfafee31373ec826e42"
+apiKey:"AIzaSyDQqQpACfdiq-i1q-hv9auGjEkSeHhMIuc",
+authDomain:"dr-duty.firebaseapp.com",
+projectId:"dr-duty",
+storageBucket:"dr-duty.firebasestorage.app",
+messagingSenderId:"1051471488231",
+appId:"1:1051471488231:web:d9abfafee31373ec826e42"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
+const specs = [
+"Emergency Medicine","Surgery","Internal Medicine","Pediatrics",
+"Orthopedics","ENT","Ophthalmology","Urology","Cardiology",
+"Neurosurgery","Radiology","Dermatology","Gynecology","Anesthesia",
+"Psychiatry","Oncology","Nephrology","Maxillfacial",
+"Pediatric Surgery","Plastic Surgery","Cardiovascular Surgery",
+"ICU","CCU","Medicine F Ward","Medicine M Ward",
+"Surgery F Ward","Surgery M Ward","Dialysis Ward",
+"Oncology Ward","Referral Doctor",
+"Emergency Ward Rotating Resident",
+"Evening Consultant",
+"Emergency Ward Intern Doctor"
+];
+
+specs.forEach(x=>{
+docSpec.innerHTML += <option>${x}</option>;
+});
+
 window.login = async function(){
 
-let u = user.value.trim();
-let p = pass.value.trim();
-
-let ref = await getDoc(doc(db,"users",u));
+let ref = await getDoc(doc(db,"users",user.value));
 
 if(!ref.exists()){
 alert("Wrong user");
@@ -146,15 +178,16 @@ return;
 
 let data = ref.data();
 
-if(data.password != p){
+if(data.password != pass.value){
 alert("Wrong password");
 return;
 }
 
-localStorage.setItem("user",u);
+localStorage.setItem("user",user.value);
 localStorage.setItem("role",data.role);
 
 startPanel();
+
 }
 
 window.startPanel = async function(){
@@ -162,39 +195,94 @@ window.startPanel = async function(){
 loginBox.classList.add("hide");
 panel.classList.remove("hide");
 
-let role = localStorage.getItem("role");
-let userx = localStorage.getItem("user");
+welcome.innerHTML =
+"Welcome " + localStorage.getItem("user");
 
-welcome.innerHTML = "Welcome: " + userx + " ("+role+")";
-
-if(role!="admin"){
+if(localStorage.getItem("role")!="admin"){
 usersBox.classList.add("hide");
 }
 
-let h = await getDoc(doc(db,"settings","hospital"));
-if(h.exists()){
-hospitalName.value = h.data().name;
-}
+loadHospitals();
+loadDoctors();
 
 }
 
-window.saveHospital = async function(){
-await setDoc(doc(db,"settings","hospital"),{
-name:hospitalName.value
+window.addHospital = async function(){
+
+if(newHospital.value=="") return;
+
+await setDoc(doc(db,"hospitals",newHospital.value),{
+name:newHospital.value
 });
-alert("Saved");
+
+newHospital.value="";
+
+loadHospitals();
+
+}
+
+async function loadHospitals(){
+
+hospitalName.innerHTML="";
+doctorHospital.innerHTML="";
+
+const query = await getDocs(collection(db,"hospitals"));
+
+query.forEach(d=>{
+
+hospitalName.innerHTML +=
+<option>${d.id}</option>;
+
+doctorHospital.innerHTML +=
+<option>${d.id}</option>;
+
+});
+
 }
 
 window.saveDoctor = async function(){
 
 await setDoc(doc(db,"doctors",docName.value),{
 name:docName.value,
-specialty:docSpec.value,
 phone:docPhone.value,
-hospital:hospitalName.value
+specialty:docSpec.value,
+hospital:doctorHospital.value
 });
 
-alert("Doctor Saved");
+loadDoctors();
+
+alert("Saved");
+
+}
+
+async function loadDoctors(){
+
+doctorList.innerHTML="<option>Select Doctor</option>";
+
+const query = await getDocs(collection(db,"doctors"));
+
+query.forEach(d=>{
+
+doctorList.innerHTML +=
+<option>${d.id}</option>;
+
+});
+
+}
+
+window.loadDoctor = async function(){
+
+let ref = await getDoc(doc(db,"doctors",doctorList.value));
+
+if(!ref.exists()) return;
+
+let d = ref.data();
+
+docName.value = d.name;
+docPhone.value = d.phone;
+docSpec.value = d.specialty;
+doctorHospital.value = d.hospital;
+
 }
 
 window.saveUser = async function(){
@@ -210,11 +298,14 @@ role:newRole.value
 });
 
 alert("User Created");
+
 }
 
 window.logout = function(){
+
 localStorage.clear();
 location.reload();
+
 }
 
 if(localStorage.getItem("user")){
