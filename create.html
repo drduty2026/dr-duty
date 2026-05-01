@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Create Departments</title>
+
+<style>
+body{
+font-family:Arial;
+background:#0d1117;
+color:white;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+margin:0;
+}
+
+.box{
+text-align:center;
+padding:30px;
+background:#161b22;
+border-radius:20px;
+width:90%;
+max-width:500px;
+box-shadow:0 0 20px rgba(0,255,255,.2);
+}
+
+button{
+width:100%;
+padding:18px;
+font-size:26px;
+font-weight:bold;
+border:none;
+border-radius:15px;
+background:#00c8ff;
+color:#000;
+cursor:pointer;
+margin-top:20px;
+}
+
+#msg{
+margin-top:20px;
+font-size:22px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="box">
+
+<h1>Create All Departments</h1>
+
+<button onclick="createAll()">Create 33 Departments</button>
+
+<div id="msg"></div>
+
+</div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+apiKey: "AIzaSyDQqQpACfdiq-i1q-hv9auGjEkSeHhMIuc",
+authDomain: "dr-duty.firebaseapp.com",
+projectId: "dr-duty",
+storageBucket: "dr-duty.firebasestorage.app",
+messagingSenderId: "1051471488231",
+appId: "1:1051471488231:web:d9abfafee31373ec826e42"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const departments = [
+"Emergency Medicine",
+"Surgery",
+"Internal Medicine",
+"Pediatrics",
+"Orthopedics",
+"ENT",
+"Ophthalmology",
+"Urology",
+"Cardiology",
+"Neurosurgery",
+"Radiology",
+"Dermatology",
+"Gynecology",
+"Anesthesia",
+"Psychiatry",
+"Oncology",
+"Nephrology",
+"Maxillfacial",
+"Pediatric Surgery",
+"Plastic Surgery",
+"Cardiovascular Surgery",
+"ICU",
+"CCU",
+"Medicine F Ward",
+"Medicine M Ward",
+"Surgery F Ward",
+"Surgery M Ward",
+"Dialysis Ward",
+"Oncology Ward",
+"Referral Doctor",
+"Emergency Ward Rotating Resident",
+"Evening Consultant",
+"Emergency Ward Intern Doctor"
+];
+
+window.createAll = async function(){
+
+document.getElementById("msg").innerText = "Creating...";
+
+for(const dep of departments){
+
+await setDoc(doc(db,"Duties",dep),{
+"Doctor Name":"",
+phone:"",
+whatsapp:"",
+hospitalAr:"",
+hospitalEn:""
+});
+
+}
+
+document.getElementById("msg").innerText = "Done ✅ 33 Departments Created";
+
+}
+
+</script>
+
+</body>
+</html>
