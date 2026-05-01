@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Dr Duty Panel</title>
+<title>Panel</title>
 
 <style>
 body{
@@ -13,7 +13,6 @@ background:#081a35;
 color:white;
 padding:20px;
 }
-
 .box{
 max-width:700px;
 margin:auto;
@@ -21,36 +20,40 @@ background:#10284f;
 padding:20px;
 border-radius:20px;
 }
-
+.card{
+background:#173764;
+padding:20px;
+margin-top:20px;
+border-radius:20px;
+}
 input,select{
 width:100%;
 padding:14px;
 margin:8px 0;
 border:none;
 border-radius:10px;
-font-size:16px;
+font-size:18px;
 }
-
 button{
-padding:12px 20px;
-background:#2d66ff;
+width:100%;
+padding:14px;
+background:#2563eb;
 color:white;
 border:none;
 border-radius:10px;
 font-size:18px;
 margin-top:10px;
 }
-
-.card{
-background:#173764;
-padding:18px;
-border-radius:18px;
-margin-top:20px;
-}
 </style>
 </head>
 
 <body>
+
+<script>
+if(localStorage.getItem("login")!="yes"){
+window.location.href="admin.html";
+}
+</script>
 
 <div class="box">
 
@@ -64,14 +67,47 @@ margin-top:20px;
 
 <div class="card">
 <h2>Add / Edit Doctor</h2>
+
 <input placeholder="Doctor Name">
+
 <select>
-<option>اختصاص 1</option>
-<option>اختصاص 2</option>
-<option>اختصاص 3</option>
-<option>اختصاص 4</option>
+<option>باطنية</option>
+<option>جراحة عامة</option>
+<option>أطفال</option>
+<option>نسائية وتوليد</option>
+<option>عظام</option>
+<option>أنف وأذن وحنجرة</option>
+<option>جلدية</option>
+<option>عيون</option>
+<option>قلبية</option>
+<option>أعصاب</option>
+<option>مسالك بولية</option>
+<option>تخدير</option>
+<option>أشعة</option>
+<option>طوارئ</option>
+<option>أسنان</option>
+<option>صدرية</option>
+<option>أورام</option>
+<option>غدد صم</option>
+<option>روماتيزم</option>
+<option>كلية</option>
+<option>جراحة أعصاب</option>
+<option>جراحة قلب</option>
+<option>تجميل</option>
+<option>طب الأسرة</option>
+<option>طب المجتمع</option>
+<option>نفسية</option>
+<option>علاج طبيعي</option>
+<option>تأهيل طبي</option>
+<option>أمراض دم</option>
+<option>مختبرات</option>
+<option>طب نووي</option>
+<option>عناية مركزة</option>
+<option>طب الشيخوخة</option>
 </select>
+
 <input placeholder="Phone Number">
+
 <button>Save Doctor</button>
 </div>
 
@@ -81,7 +117,8 @@ margin-top:20px;
 
 <script>
 function logout(){
-  window.location.href="admin.html";
+localStorage.removeItem("login");
+window.location.href="admin.html";
 }
 </script>
 
