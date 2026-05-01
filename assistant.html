@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>assistant.html</title>
+<style>
+body{margin:0;font-family:Arial;background:#0b1730;color:#fff;padding:20px}
+.box{max-width:800px;margin:auto;background:#10284f;padding:20px;border-radius:20px}
+.card{background:#173764;padding:18px;border-radius:18px;margin-top:15px}
+input,select,button{width:100%;padding:14px;margin:8px 0;border:none;border-radius:10px;font-size:17px}
+button{background:#2563eb;color:#fff}
+.red{background:#dc2626}
+</style>
+</head>
+<body>
+
+<script>
+if(localStorage.getItem("role")!="assistant"){location.href="admin.html";}
+</script>
+
+<div class="box">
+<h1>Assistant Panel</h1>
+
+<div class="card">
+<h2>Edit Doctor</h2>
+
+<select id="doctorSelect" onchange="loadDoctor()"></select>
+
+<input id="docName" placeholder="Doctor Name">
+<input id="docPhone" placeholder="Phone Number">
+
+<select id="docSpec"></select>
+
+<select id="docHospital"></select>
+
+<button onclick="saveDoctor()">Save Changes</button>
+</div>
+
+<button class="red" onclick="logout()">Logout</button>
+
+</div>
+
+<script>
+function getData(k){return JSON.parse(localStorage.getItem(k)||"[]")}
+function setData(k,v){localStorage.setItem(k,JSON.stringify(v))}
+
+const specs=[
+"Emergency Medicine","Surgery","Internal Medicine","Pediatrics",
+"Orthopedics","ENT","Ophthalmology","Urology","Cardiology",
+"Neurosurgery","Radiology","Dermatology","Gynecology","Anesthesia",
+"Psychiatry","Oncology","Nephrology","Maxillofacial",
+"Pediatric Surgery","Plastic Surgery","Cardiovascular Surgery",
+"ICU","CCU","Medicine F Ward","Medicine M Ward",
+"Surgery F Ward","Surgery M Ward","Dialysis Ward",
+"Oncology Ward","Referral Doctor",
+"Emergency Ward Rotating Resident",
+"Evening Consultant",
+"Emergency Ward Intern Doctor"
+];
+
+specs.forEach(x=>{
+docSpec.innerHTML += <option>${x}</option>;
+});
+
+function loadHospitals(){
+let arr=getData("hospitals");
+docHospital.innerHTML="";
+arr.forEach(x=>{
+docHospital.innerHTML += <option>${x}</option>;
+});
+}
+
+function loadDoctors(){
+let arr=getData("doctors");
+doctorSelect.innerHTML="<option>Select Doctor</option>";
+arr.forEach(x=>{
+doctorSelect.innerHTML += <option>${x.name}</option>;
+});
+}
+
+function loadDoctor(){
+let arr=getData("doctors");
+let d=arr.find(x=>x.name==doctorSelect.value);
+if(!d)return;
+
+docName.value=d.name;
+docPhone.value=d.phone;
+docSpec.value=d.spec;
+docHospital.value=d.hospital;
+}
+
+function saveDoctor(){
+let arr=getData("doctors");
+
+arr=arr.filter(x=>x.name!=doctorSelect.value);
+
+arr.push({
+name:docName.value,
+phone:docPhone.value,
+spec:docSpec.value,
+hospital:docHospital.value
+});
+
+setData("doctors",arr);
+loadDoctors();
+alert("Saved");
+}
+
+function logout(){
+localStorage.removeItem("role");
+location.href="admin.html";
+}
+
+loadHospitals();
+loadDoctors();
+</script>
+
+</body>
+</html>
