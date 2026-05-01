@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Dr Duty Admin</title>
+<title>Admin Login</title>
 
 <style>
 body{
@@ -17,12 +17,11 @@ height:100vh;
 color:white;
 }
 .box{
-width:90%;
-max-width:420px;
-background:#10203a;
-padding:25px;
+background:#10284f;
+padding:30px;
 border-radius:20px;
-text-align:center;
+width:90%;
+max-width:400px;
 }
 input{
 width:100%;
@@ -30,25 +29,24 @@ padding:14px;
 margin:8px 0;
 border:none;
 border-radius:10px;
-font-size:16px;
+font-size:18px;
 }
 button{
 width:100%;
 padding:14px;
-margin-top:10px;
-border:none;
-border-radius:10px;
 background:#2563eb;
 color:white;
-font-size:18px;
-font-weight:bold;
+border:none;
+border-radius:10px;
+font-size:20px;
 }
 </style>
 </head>
+
 <body>
 
 <div class="box">
-<h1>Dr Duty Admin</h1>
+<h1>Dr Duty Login</h1>
 
 <input id="user" placeholder="Username">
 <input id="pass" type="password" placeholder="Password">
@@ -59,15 +57,13 @@ font-weight:bold;
 <script>
 function login(){
 
-let u=document.getElementById("user").value.trim();
-let p=document.getElementById("pass").value.trim();
+var u = document.getElementById("user").value;
+var p = document.getElementById("pass").value;
 
-if(u==="admin" && p==="1234"){
- window.location.href="panel.html";
-}
-else{
-    alert("Wrong login");
-}
+if(u=="admin" && p=="1234"){
+window.location.href="panel.html";
+}else{
+alert("Wrong Login");
 }
 
 }
