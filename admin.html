@@ -39,6 +39,7 @@ color:white;
 border:none;
 border-radius:10px;
 font-size:20px;
+margin-top:10px;
 }
 </style>
 </head>
@@ -57,10 +58,11 @@ font-size:20px;
 <script>
 function login(){
 
-var u = document.getElementById("user").value;
-var p = document.getElementById("pass").value;
+let u=document.getElementById("user").value.trim();
+let p=document.getElementById("pass").value.trim();
 
 if(u=="admin" && p=="1234"){
+localStorage.setItem("login","yes");
 window.location.href="panel.html";
 }else{
 alert("Wrong Login");
