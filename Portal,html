@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dr_Duty Portal</title>
+<style>
+body{
+margin:0;
+font-family:Arial;
+background:#061a2b;
+color:white;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+}
+.card{
+width:360px;
+padding:25px;
+border-radius:25px;
+background:#0e2d45;
+box-shadow:0 0 25px rgba(0,180,255,.35);
+text-align:center;
+}
+h1{margin:0 0 10px;}
+h2{margin:10px 0;color:#7fdcff;}
+p{font-size:18px;}
+.btn{
+display:block;
+margin:12px auto;
+padding:12px;
+width:85%;
+border-radius:14px;
+text-decoration:none;
+color:white;
+font-size:18px;
+}
+.call{background:#28a745;}
+.wa{background:#25D366;}
+.time{margin-top:15px;font-size:14px;color:#ccc;}
+</style>
+</head>
+<body>
+
+<div class="card">
+<h1>Dr_Duty</h1>
+<h2 id="spec">Emergency Medicine</h2>
+<p id="name">Dr. Mohammed Naser</p>
+<p id="phone">9647805871273</p>
+
+<a class="btn call" id="callBtn" href="tel:9647805871273">📞 Call</a>
+<a class="btn wa" id="waBtn" href="https://wa.me/9647805871273">💬 WhatsApp</a>
+
+<div class="time" id="time"></div>
+</div>
+
+<script>
+document.getElementById("time").innerHTML =
+"Updated: " + new Date().toLocaleString();
+</script>
+
+</body>
+</html>
