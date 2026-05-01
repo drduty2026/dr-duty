@@ -60,55 +60,25 @@ window.location.href="admin.html";
 <h1>Dr Duty Control Panel</h1>
 
 <div class="card">
-<h2>Hospital Name</h2>
-<input placeholder="Hospital Name">
-<button>Save</button>
+<h2>Add Hospital</h2>
+
+<input id="hospitalInput" placeholder="Hospital Name">
+<button onclick="saveHospital()">Save Hospital</button>
+
+<select id="hospitalList"></select>
 </div>
 
 <div class="card">
-<h2>Add / Edit Doctor</h2>
+<h2>Add Doctor</h2>
 
-<input placeholder="Doctor Name">
+<input id="docName" placeholder="Doctor Name">
+<input id="docPhone" placeholder="Phone Number">
 
-<select>
-<option>Emergency Medicine</option>
-<option>Surgery</option>
-<option>Internal Medicine</option>
-<option>Pediatrics</option>
-<option>Orthopedics</option>
-<option>ENT</option>
-<option>Ophthalmology</option>
-<option>Urology</option>
-<option>Cardiology</option>
-<option>Neurosurgery</option>
-<option>Radiology</option>
-<option>Dermatology</option>
-<option>Gynecology</option>
-<option>Anesthesia</option>
-<option>Psychiatry</option>
-<option>Oncology</option>
-<option>Nephrology</option>
-<option>Maxillofacial</option>
-<option>Pediatric Surgery</option>
-<option>Plastic Surgery</option>
-<option>Cardiovascular Surgery</option>
-<option>ICU</option>
-<option>CCU</option>
-<option>Medicine F Ward</option>
-<option>Medicine M Ward</option>
-<option>Surgery F Ward</option>
-<option>Surgery M Ward</option>
-<option>Dialysis Ward</option>
-<option>Oncology Ward</option>
-<option>Referral Doctor</option>
-<option>Emergency Ward Rotating Resident</option>
-<option>Evening Consultant</option>
-<option>Emergency Ward Intern Doctor</option>
-</select>
+<button onclick="saveDoctor()">Save Doctor</button>
 
-<input placeholder="Phone Number">
+<select id="doctorList" onchange="showPhone()"></select>
 
-<button>Save Doctor</button>
+<input id="phoneShow" placeholder="Phone Number" readonly>
 </div>
 
 <button onclick="logout()">Logout</button>
@@ -116,10 +86,71 @@ window.location.href="admin.html";
 </div>
 
 <script>
+
+function loadHospitals(){
+let data=JSON.parse(localStorage.getItem("hospitals")||"[]");
+let list=document.getElementById("hospitalList");
+list.innerHTML="";
+data.forEach(h=>{
+list.innerHTML += "<option>"+h+"</option>";
+});
+}
+
+function saveHospital(){
+let name=document.getElementById("hospitalInput").value.trim();
+if(name=="") return;
+
+let data=JSON.parse(localStorage.getItem("hospitals")||"[]");
+data.push(name);
+localStorage.setItem("hospitals",JSON.stringify(data));
+document.getElementById("hospitalInput").value="";
+loadHospitals();
+}
+
+function loadDoctors(){
+let data=JSON.parse(localStorage.getItem("doctors")||"[]");
+let list=document.getElementById("doctorList");
+list.innerHTML="";
+data.forEach(d=>{
+list.innerHTML += "<option>"+d.name+"</option>";
+});
+}
+
+function saveDoctor(){
+let name=document.getElementById("docName").value.trim();
+let phone=document.getElementById("docPhone").value.trim();
+
+if(name==""||phone=="") return;
+
+let data=JSON.parse(localStorage.getItem("doctors")||"[]");
+data.push({name:name,phone:phone});
+localStorage.setItem("doctors",JSON.stringify(data));
+
+document.getElementById("docName").value="";
+document.getElementById("docPhone").value="";
+
+loadDoctors();
+}
+
+function showPhone(){
+let name=document.getElementById("doctorList").value;
+let data=JSON.parse(localStorage.getItem("doctors")||"[]");
+
+for(let i=0;i<data.length;i++){
+if(data[i].name==name){
+document.getElementById("phoneShow").value=data[i].phone;
+}
+}
+}
+
 function logout(){
 localStorage.removeItem("login");
 window.location.href="admin.html";
 }
+
+loadHospitals();
+loadDoctors();
+
 </script>
 
 </body>
