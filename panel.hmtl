@@ -81,7 +81,7 @@ margin-top:20px;
 
 <script>
 function logout(){
-window.location.href="admin.html";
+  window.location.href="admin.html";
 }
 </script>
 
