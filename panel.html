@@ -6,14 +6,45 @@
 <title>panel.html</title>
 
 <style>
-body{margin:0;font-family:Arial;background:#081a35;color:#fff;padding:20px}
-.box{max-width:900px;margin:auto;background:#10284f;padding:20px;border-radius:20px}
-.card{background:#173764;padding:18px;border-radius:18px;margin-top:15px}
-input,select,button{width:100%;padding:14px;margin:8px 0;border:none;border-radius:10px;font-size:17px}
-button{background:#2563eb;color:#fff}
+body{
+margin:0;
+font-family:Arial;
+background:#081a35;
+color:#fff;
+padding:20px;
+}
+.box{
+max-width:900px;
+margin:auto;
+background:#10284f;
+padding:20px;
+border-radius:20px;
+}
+.card{
+background:#173764;
+padding:18px;
+border-radius:18px;
+margin-top:15px;
+}
+input,select,button{
+width:100%;
+padding:14px;
+margin:8px 0;
+border:none;
+border-radius:10px;
+font-size:17px;
+box-sizing:border-box;
+}
+button{
+background:#2563eb;
+color:#fff;
+cursor:pointer;
+}
 .red{background:#dc2626}
 .orange{background:#ea580c}
 .green{background:#16a34a}
+.gray{background:#475569}
+h1,h2{margin-top:0}
 small{color:#ddd}
 </style>
 </head>
@@ -21,17 +52,21 @@ small{color:#ddd}
 <body>
 
 <script>
-if(localStorage.getItem("role")!="admin"){location.href="admin.html";}
+if(localStorage.getItem("role")!="admin"){
+location.href="admin.html";
+}
 </script>
 
 <div class="box">
 
 <h1>Admin Panel</h1>
 
+<!-- Hospitals -->
 <div class="card">
 <h2>Hospitals</h2>
 
 <input id="hospitalInput" placeholder="Hospital Name">
+
 <button onclick="addHospital()">Add Hospital</button>
 
 <select id="hospitalList"></select>
@@ -39,6 +74,7 @@ if(localStorage.getItem("role")!="admin"){location.href="admin.html";}
 <button class="red" onclick="deleteHospital()">Delete Selected Hospital</button>
 </div>
 
+<!-- Doctors -->
 <div class="card">
 <h2>Doctors</h2>
 
@@ -89,6 +125,7 @@ if(localStorage.getItem("role")!="admin"){location.href="admin.html";}
 <button class="red" onclick="deleteDoctor()">Delete Doctor</button>
 </div>
 
+<!-- Assistants -->
 <div class="card">
 <h2>Assistants</h2>
 
@@ -107,7 +144,7 @@ if(localStorage.getItem("role")!="admin"){location.href="admin.html";}
 
 <button class="red" onclick="deleteAssistant()">Delete Assistant</button>
 
-<button class="red" onclick="disableAssistant()">Disable / Enable Assistant</button>
+<button class="gray" onclick="toggleAssistant()">Disable / Enable Assistant</button>
 
 <small id="assistInfo"></small>
 </div>
@@ -117,148 +154,263 @@ if(localStorage.getItem("role")!="admin"){location.href="admin.html";}
 </div>
 
 <script>
-function getData(k){return JSON.parse(localStorage.getItem(k)||"[]")}
-function setData(k,v){localStorage.setItem(k,JSON.stringify(v))}
 
-/* hospitals */
+function getData(key){
+return JSON.parse(localStorage.getItem(key)||"[]");
+}
+
+function setData(key,val){
+localStorage.setItem(key,JSON.stringify(val));
+}
+
+/* ---------------- Hospitals ---------------- */
+
 function loadHospitals(){
 let arr=getData("hospitals");
+
 hospitalList.innerHTML="";
 docHospital.innerHTML="";
+
 arr.forEach(x=>{
 hospitalList.innerHTML+=<option>${x}</option>;
 docHospital.innerHTML+=<option>${x}</option>;
 });
 }
+
 function addHospital(){
 let v=hospitalInput.value.trim();
-if(v=="")return;
+if(v=="") return;
+
 let arr=getData("hospitals");
 arr.push(v);
+
 setData("hospitals",arr);
+
 hospitalInput.value="";
 loadHospitals();
-}
-function deleteHospital(){
-let arr=getData("hospitals").filter(x=>x!=hospitalList.value);
-setData("hospitals",arr);
-loadHospitals();
+
+alert("Hospital Added");
 }
 
-/* doctors */
+function deleteHospital(){
+if(!hospitalList.value) return;
+
+if(!confirm("Are you sure?")) return;
+
+let arr=getData("hospitals").filter(x=>x!=hospitalList.value);
+
+setData("hospitals",arr);
+loadHospitals();
+
+alert("Deleted");
+}
+
+/* ---------------- Doctors ---------------- */
+
 function loadDoctors(){
 let arr=getData("doctors");
-doctorSelect.innerHTML="<option>Select Doctor</option>";
-arr.forEach(x=>{
-doctorSelect.innerHTML+=<option>${x.name}</option>;
+
+doctorSelect.innerHTML="<option value=''>Select Doctor</option>";
+
+arr.forEach(d=>{
+doctorSelect.innerHTML+=<option>${d.name}</option>;
 });
 }
-function saveDoctor(){
-let arr=getData("doctors");
-let obj={
-name:docName.value,
-phone:docPhone.value,
-spec:docSpec.value,
-hospital:docHospital.value
-};
-arr=arr.filter(x=>x.name!=doctorSelect.value && x.name!=obj.name);
-arr.push(obj);
-setData("doctors",arr);
-loadDoctors();
-alert("Saved");
-}
+
 function loadDoctor(){
 let arr=getData("doctors");
+
 let d=arr.find(x=>x.name==doctorSelect.value);
-if(!d)return;
+
+if(!d) return;
+
 docName.value=d.name;
 docPhone.value=d.phone;
 docSpec.value=d.spec;
 docHospital.value=d.hospital;
 }
-function deleteDoctor(){
-let arr=getData("doctors").filter(x=>x.name!=doctorSelect.value);
+
+function saveDoctor(){
+
+let name=docName.value.trim();
+if(name=="") return alert("Enter Doctor Name");
+
+let arr=getData("doctors");
+
+arr=arr.filter(x=>x.name!=doctorSelect.value && x.name!=name);
+
+arr.push({
+name:name,
+phone:docPhone.value.trim(),
+spec:docSpec.value,
+hospital:docHospital.value
+});
+
 setData("doctors",arr);
+
 loadDoctors();
+
+alert("Doctor Saved");
 }
 
-/* assistants */
+function deleteDoctor(){
+
+if(!doctorSelect.value) return;
+
+if(!confirm("Are you sure?")) return;
+
+let arr=getData("doctors").filter(x=>x.name!=doctorSelect.value);
+
+setData("doctors",arr);
+
+loadDoctors();
+
+docName.value="";
+docPhone.value="";
+
+alert("Doctor Deleted");
+}
+
+/* ---------------- Assistants ---------------- */
+
 function loadAssistants(){
+
 let arr=getData("assistants");
-assistantList.innerHTML="<option>Select Assistant</option>";
-arr.forEach(x=>{
-assistantList.innerHTML+=<option>${x.user}</option>;
+
+assistantList.innerHTML="<option value=''>Select Assistant</option>";
+
+arr.forEach(a=>{
+assistantList.innerHTML+=<option>${a.user}</option>;
 });
+
 assistInfo.innerHTML="Total Assistants: "+arr.length;
 }
+
 function addAssistant(){
+
+let u=aUser.value.trim();
+let p=aPass.value.trim();
+
+if(u=="" || p=="") return alert("Enter username & password");
+
 let arr=getData("assistants");
+
 arr.push({
-user:aUser.value,
-pass:aPass.value,
+user:u,
+pass:p,
 disabled:false
 });
+
 setData("assistants",arr);
+
 aUser.value="";
 aPass.value="";
+
 loadAssistants();
+
 alert("Assistant Added");
 }
+
 function quickAssistant(){
+
 let arr=getData("assistants");
+
 let num=arr.length+1;
+
 arr.push({
 user:"assistant"+num,
 pass:"1234",
 disabled:false
 });
+
 setData("assistants",arr);
+
 loadAssistants();
-alert("Created: assistant"+num+" / 1234");
+
+alert("Created assistant"+num+" / 1234");
 }
+
 function loadAssistant(){
+
 let arr=getData("assistants");
-let d=arr.find(x=>x.user==assistantList.value);
-if(!d)return;
-editPass.value=d.pass;
-assistInfo.innerHTML="Status: "+(d.disabled?"Disabled":"Active");
+
+let a=arr.find(x=>x.user==assistantList.value);
+
+if(!a) return;
+
+editPass.value=a.pass;
+
+assistInfo.innerHTML="Status: "+(a.disabled?"Disabled":"Active");
 }
+
 function changeAssistantPass(){
+
+if(!assistantList.value) return;
+
 let arr=getData("assistants");
-arr.forEach(x=>{
-if(x.user==assistantList.value){x.pass=editPass.value;}
+
+arr.forEach(a=>{
+if(a.user==assistantList.value){
+a.pass=editPass.value.trim();
+}
 });
+
 setData("assistants",arr);
-loadAssistants();
+
 alert("Password Changed");
 }
+
 function deleteAssistant(){
+
+if(!assistantList.value) return;
+
+if(!confirm("Are you sure?")) return;
+
 let arr=getData("assistants").filter(x=>x.user!=assistantList.value);
+
 setData("assistants",arr);
+
 loadAssistants();
+
 alert("Deleted");
 }
-function disableAssistant(){
+
+function toggleAssistant(){
+
+if(!assistantList.value) return;
+
 let arr=getData("assistants");
-arr.forEach(x=>{
-if(x.user==assistantList.value){
-x.disabled=!x.disabled;
+
+arr.forEach(a=>{
+if(a.user==assistantList.value){
+a.disabled=!a.disabled;
 }
 });
+
 setData("assistants",arr);
+
 loadAssistants();
+
 alert("Updated");
 }
 
-/* logout */
+/* ---------------- Logout ---------------- */
+
 function logout(){
+
+if(!confirm("Are you sure?")) return;
+
 localStorage.removeItem("role");
-location.href="admin.html";
+
+window.location.href="admin.html";
 }
+
+/* Start */
 
 loadHospitals();
 loadDoctors();
 loadAssistants();
+
 </script>
 
 </body>
