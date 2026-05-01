@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Dr Duty Admin</title>
+
+<style>
+body{
+font-family:Arial;
+background:#0b1020;
+margin:0;
+padding:20px;
+color:white;
+}
+
+.box{
+max-width:700px;
+margin:auto;
+background:#111827;
+padding:25px;
+border-radius:20px;
+box-shadow:0 0 25px rgba(0,255,255,.15);
+}
+
+input,select{
+width:100%;
+padding:14px;
+margin:10px 0;
+font-size:20px;
+border-radius:12px;
+border:none;
+}
+
+button{
+width:100%;
+padding:16px;
+margin-top:12px;
+font-size:24px;
+font-weight:bold;
+border:none;
+border-radius:14px;
+background:#00d4ff;
+cursor:pointer;
+}
+
+#msg{
+margin-top:15px;
+font-size:22px;
+text-align:center;
+}
+</style>
+</head>
+<body>
+
+<div class="box" id="loginBox">
+<h1>Admin Login</h1>
+<input type="password" id="pass" placeholder="Password">
+<button onclick="login()">Enter</button>
+<div id="loginMsg"></div>
+</div>
+
+<div class="box" id="panel" style="display:none;">
+
+<h1>Dr Duty Control</h1>
+
+<select id="dep"></select>
+
+<input id="doctor" placeholder="Doctor Name">
+<input id="phone" placeholder="Phone">
+<input id="wa" placeholder="WhatsApp">
+<input id="har" placeholder="Hospital Arabic">
+<input id="hen" placeholder="Hospital English">
+
+<button onclick="saveData()">Save</button>
+
+<div id="msg"></div>
+
+</div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+apiKey:"AIzaSyDQqQpACfdiq-i1q-hv9auGjEkSeHhMIuc",
+authDomain:"dr-duty.firebaseapp.com",
+projectId:"dr-duty",
+storageBucket:"dr-duty.firebasestorage.app",
+messagingSenderId:"1051471488231",
+appId:"1:1051471488231:web:d9abfafee31373ec826e42"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const password = "54321";
+
+const deps = [
+"Emergency Medicine",
+"Surgery",
+"Internal Medicine",
+"Pediatrics",
+"Orthopedics",
+"ENT",
+"Ophthalmology",
+"Urology",
+"Cardiology",
+"Neurosurgery",
+"Radiology",
+"Dermatology",
+"Gynecology",
+"Anesthesia",
+"Psychiatry",
+"Oncology",
+"Nephrology",
+"Maxillfacial",
+"Pediatric Surgery",
+"Plastic Surgery",
+"Cardiovascular Surgery",
+"ICU",
+"CCU",
+"Medicine F Ward",
+"Medicine M Ward",
+"Surgery F Ward",
+"Surgery M Ward",
+"Dialysis Ward",
+"Oncology Ward",
+"Referral Doctor",
+"Emergency Ward Rotating Resident",
+"Evening Consultant",
+"Emergency Ward Intern Doctor"
+];
+
+const sel = document.getElementById("dep");
+
+deps.forEach(d=>{
+let op=document.createElement("option");
+op.value=d;
+op.textContent=d;
+sel.appendChild(op);
+});
+
+window.login = function(){
+if(document.getElementById("pass").value===password){
+document.getElementById("loginBox").style.display="none";
+document.getElementById("panel").style.display="block";
+loadData();
+}else{
+document.getElementById("loginMsg").innerText="Wrong Password";
+}
+}
+
+sel.onchange=loadData;
+
+async function loadData(){
+
+const ref = doc(db,"Duties",sel.value);
+const snap = await getDoc(ref);
+
+if(snap.exists()){
+
+const d = snap.data();
+
+doctor.value=d["Doctor Name"]||"";
+phone.value=d.phone||"";
+wa.value=d.whatsapp||"";
+har.value=d.hospitalAr||"";
+hen.value=d.hospitalEn||"";
+
+}
+
+}
+
+window.saveData = async function(){
+
+await setDoc(doc(db,"Duties",sel.value),{
+
+"Doctor Name":doctor.value,
+phone:phone.value,
+whatsapp:wa.value,
+hospitalAr:har.value,
+hospitalEn:hen.value
+
+});
+
+msg.innerText="Saved Successfully ✅";
+
+}
+
+</script>
+</body>
+</html>
