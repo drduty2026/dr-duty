@@ -129,19 +129,49 @@ opacity:.9;
 
 </div>
 
-<script>
-const params = new URLSearchParams(window.location.search);
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-const spec = params.get("spec");
-if(spec){
+const firebaseConfig = {
+apiKey:"AIzaSyDQqQpACfdiq-i1q-hv9auGjEkSeHhMIuc",
+authDomain: "dr-duty.firebaseapp.com",
+projectId: "dr-duty",
+storageBucket: "dr-duty.firebasestorage.app",
+messagingSenderId: "1051471488231",
+appId: "1:1051471488231:web:d9abfafee31373ec826e42"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const params = new URLSearchParams(window.location.search);
+const spec = params.get("spec") || "Emergency";
+
 document.getElementById("specialtyName").innerText = spec;
+
+async function loadDuty(){
+const ref = doc(db,"Duties",spec);
+const snap = await getDoc(ref);
+
+if(snap.exists()){
+const data = snap.data();
+
+document.getElementById("doctorName").innerText = data["Doctor Name"];
+document.getElementById("phone").innerText = data.phone;
+
+document.getElementById("callBtn").href = "tel:"+data.phone;
+document.getElementById("waBtn").href = "https://wa.me/"+data.whatsapp;
 }
+}
+
+loadDuty();
 
 const now = new Date();
 document.getElementById("today").innerText =
 "Updated: " +
-now.getDate().toString().padStart(2,'0') + "/" +
-(now.getMonth()+1).toString().padStart(2,'0') + "/" +
+now.getDate() + "/" +
+(now.getMonth()+1) + "/" +
 now.getFullYear();
 </script>
 
