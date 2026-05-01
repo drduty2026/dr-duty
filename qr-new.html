@@ -9,26 +9,14 @@
 <style>
 body{
 margin:0;
-padding:30px;
+padding:25px;
 font-family:Arial,sans-serif;
 background:#081226;
 color:#fff;
 text-align:center;
 }
-h1{font-size:56px;margin:0 0 10px}
-p{font-size:22px;color:#aaa;margin:0 0 25px}
-
-.topbtn{
-background:#2563eb;
-color:#fff;
-border:none;
-padding:15px 28px;
-font-size:22px;
-border-radius:18px;
-font-weight:bold;
-cursor:pointer;
-margin-bottom:30px;
-}
+h1{font-size:52px;margin:0 0 10px}
+p{font-size:22px;color:#aaa;margin:0 0 30px}
 
 .grid{
 display:grid;
@@ -40,8 +28,7 @@ gap:22px;
 background:#fff;
 color:#000;
 padding:18px;
-border-radius:18px;
-box-shadow:0 10px 25px rgba(0,0,0,.25);
+border-radius:20px;
 }
 
 .name{
@@ -53,24 +40,6 @@ margin-bottom:12px;
 .qr{
 display:flex;
 justify-content:center;
-margin-bottom:12px;
-}
-
-.dbtn{
-background:#16a34a;
-color:#fff;
-border:none;
-padding:10px 18px;
-border-radius:12px;
-font-size:16px;
-font-weight:bold;
-cursor:pointer;
-}
-
-@media print{
-.topbtn,.dbtn{display:none}
-body{background:#fff;color:#000}
-p{color:#000}
 }
 </style>
 </head>
@@ -79,8 +48,6 @@ p{color:#000}
 
 <h1>Dr Duty QR Codes</h1>
 <p>33 Updated Departments</p>
-
-<button class="topbtn" onclick="window.print()">Download All PDF</button>
 
 <div class="grid" id="grid"></div>
 
@@ -104,11 +71,9 @@ let url=base+encodeURIComponent(dep);
 
 let card=document.createElement("div");
 card.className="card";
-
 card.innerHTML=
 <div class="name">${dep}</div>
 <div class="qr" id="qr${id}"></div>
-<button class="dbtn" onclick="downloadQR('qr${id}','${dep}')">Download PNG</button>
 ;
 
 grid.appendChild(card);
@@ -119,15 +84,6 @@ width:180,
 height:180
 });
 });
-
-function downloadQR(id,name){
-let canvas=document.querySelector("#"+id+" canvas");
-if(!canvas)return;
-let a=document.createElement("a");
-a.href=canvas.toDataURL("image/png");
-a.download=name+".png";
-a.click();
-}
 </script>
 
 </body>
