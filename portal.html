@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dr_Duty Portal</title>
+<title>Dr Duty Portal</title>
 
 <style>
 *{
@@ -18,61 +18,64 @@ height:100vh;
 display:flex;
 justify-content:center;
 align-items:center;
-background:url('https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&w=1400&q=80') no-repeat center center/cover;
+background:url('https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&w=1200&q=80') center/cover no-repeat;
+position:relative;
 }
 
 .overlay{
 position:absolute;
 width:100%;
 height:100%;
-background:rgba(0,0,0,.35);
+background:rgba(0,0,0,.45);
+backdrop-filter:blur(3px);
 }
 
 .card{
 position:relative;
 z-index:2;
-width:460px;
-padding:30px;
-border-radius:28px;
-background:rgba(10,30,60,.55);
-backdrop-filter:blur(10px);
-box-shadow:0 0 28px #00bfff;
+width:95%;
+max-width:520px;
+padding:35px 25px;
+border-radius:30px;
+background:rgba(20,20,30,.55);
+backdrop-filter:blur(12px);
 text-align:center;
-color:white;
+color:#fff;
+box-shadow:0 0 25px rgba(0,255,255,.25);
 }
 
-.top1{
-font-size:34px;
+#hospitalAr{
+font-size:42px;
 font-weight:bold;
 margin-bottom:8px;
 }
 
-.top2{
-font-size:20px;
-color:#9ffcff;
-margin-bottom:18px;
+#hospitalEn{
+font-size:22px;
+color:#9ff8ff;
+margin-bottom:25px;
 }
 
-.logo{
-font-size:58px;
+#mainTitle{
+font-size:72px;
+font-weight:bold;
+margin-bottom:10px;
+}
+
+#specialtyName{
+font-size:48px;
+color:#35f3ff;
 font-weight:bold;
 margin-bottom:20px;
 }
 
-.spec{
+#doctorName{
 font-size:34px;
-font-weight:bold;
-color:#56ffff;
-margin-bottom:18px;
-}
-
-.doc{
-font-size:24px;
 margin-bottom:10px;
 }
 
-.phone{
-font-size:22px;
+#phone{
+font-size:28px;
 margin-bottom:25px;
 }
 
@@ -80,25 +83,26 @@ margin-bottom:25px;
 display:block;
 width:100%;
 padding:18px;
-margin-top:14px;
-border-radius:16px;
+border-radius:18px;
 text-decoration:none;
-font-size:28px;
+font-size:34px;
 font-weight:bold;
-color:white;
+margin-bottom:15px;
+color:#fff;
 }
 
 .call{
-background:linear-gradient(90deg,#0055ff,#00d9ff);
+background:linear-gradient(90deg,#0057ff,#11d8ff);
 }
 
 .whats{
-background:#19e600;
+background:#24f000;
+color:#fff;
 }
 
 .date{
-margin-top:20px;
-font-size:18px;
+margin-top:10px;
+font-size:26px;
 opacity:.9;
 }
 </style>
@@ -110,31 +114,32 @@ opacity:.9;
 
 <div class="card">
 
-<div class="top1">مستشفى الموانئ العام</div>
-<div class="top2">Al-Mawani General Hospital</div>
+<div id="hospitalAr">جاري التحميل...</div>
+<div id="hospitalEn"></div>
 
-<div class="logo">Dr_Duty</div>
+<div id="mainTitle">Dr_Duty</div>
 
-<div class="spec" id="specialtyName">Emergency Medicine</div>
+<div id="specialtyName">Loading...</div>
 
-<div class="doc">Dr. Mohammed Naser</div>
+<div id="doctorName"></div>
 
-<div class="phone" id="phoneText">9647805871273</div>
+<div id="phone"></div>
 
-<a class="btn call" id="callBtn" href="tel:9647805871273">📞 Call</a>
+<a class="btn call" id="callBtn" href="#">📞 Call</a>
 
-<a class="btn whats" id="waBtn" href="https://wa.me/9647805871273">💬 WhatsApp</a>
+<a class="btn whats" id="waBtn" href="#">💬 WhatsApp</a>
 
 <div class="date" id="today"></div>
 
 </div>
 
 <script type="module">
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
-apiKey:"AIzaSyDQqQpACfdiq-i1q-hv9auGjEkSeHhMIuc",
+apiKey: "AIzaSyDQqQpACfdiq-i1q-hv9auGjEkSeHhMIuc",
 authDomain: "dr-duty.firebaseapp.com",
 projectId: "dr-duty",
 storageBucket: "dr-duty.firebasestorage.app",
@@ -151,28 +156,46 @@ const spec = params.get("spec") || "Emergency";
 document.getElementById("specialtyName").innerText = spec;
 
 async function loadDuty(){
+
 const ref = doc(db,"Duties",spec);
 const snap = await getDoc(ref);
 
 if(snap.exists()){
+
 const data = snap.data();
 
-document.getElementById("doctorName").innerText = data["Doctor Name"];
-document.getElementById("phone").innerText = data.phone;
+document.getElementById("hospitalAr").innerText =
+data.hospitalAr || "مستشفى غير معروف";
 
-document.getElementById("callBtn").href = "tel:"+data.phone;
-document.getElementById("waBtn").href = "https://wa.me/"+data.whatsapp;
+document.getElementById("hospitalEn").innerText =
+data.hospitalEn || "Unknown Hospital";
+
+document.getElementById("doctorName").innerText =
+data["Doctor Name"] || "";
+
+document.getElementById("phone").innerText =
+data.phone || "";
+
+document.getElementById("callBtn").href =
+"tel:" + (data.phone || "");
+
+document.getElementById("waBtn").href =
+"https://wa.me/" + (data.whatsapp || "");
+
 }
+
 }
 
 loadDuty();
 
 const now = new Date();
+
 document.getElementById("today").innerText =
 "Updated: " +
 now.getDate() + "/" +
 (now.getMonth()+1) + "/" +
 now.getFullYear();
+
 </script>
 
 </body>
