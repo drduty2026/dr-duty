@@ -1,54 +1,56 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-
 <title>Dr Duty Portal</title>
 
 <style>
-body{
+*{
 margin:0;
 padding:0;
-font-family:Arial;
-background:url('https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&w=1200&q=80');
-background-size:cover;
-background-position:center;
+box-sizing:border-box;
+font-family:Arial, sans-serif;
+}
+
+body{
 height:100vh;
 display:flex;
 justify-content:center;
 align-items:center;
+background:url("https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&w=1200&q=80") center/cover no-repeat;
+overflow:hidden;
 }
 
 .overlay{
 position:fixed;
 inset:0;
 background:rgba(0,0,0,0.45);
-backdrop-filter:blur(4px);
+backdrop-filter:blur(5px);
 }
 
 .card{
 position:relative;
 z-index:2;
-width:90%;
-max-width:650px;
-background:rgba(20,20,30,0.55);
+width:92%;
+max-width:700px;
+background:rgba(20,20,30,0.58);
 padding:30px;
 border-radius:30px;
 text-align:center;
 color:#fff;
-box-shadow:0 0 30px #00d9ff55;
+box-shadow:0 0 35px rgba(0,255,255,.25);
 }
 
 #hospitalAr{
-font-size:46px;
+font-size:44px;
 font-weight:bold;
-margin-bottom:10px;
+margin-bottom:8px;
 }
 
 #hospitalEn{
-font-size:24px;
-color:#9ff8ff;
+font-size:22px;
+color:#9ef8ff;
 margin-bottom:25px;
 }
 
@@ -59,10 +61,10 @@ margin-bottom:10px;
 }
 
 #specialtyName{
-font-size:48px;
-color:#35f3ff;
+font-size:44px;
 font-weight:bold;
-margin-bottom:20px;
+color:#37f6ff;
+margin-bottom:18px;
 }
 
 #doctorName{
@@ -72,31 +74,41 @@ margin-bottom:10px;
 
 #phone{
 font-size:28px;
-margin-bottom:25px;
+margin-bottom:20px;
 }
 
 .btn{
 display:block;
 text-decoration:none;
 padding:18px;
+margin:14px 0;
 border-radius:18px;
 font-size:34px;
 font-weight:bold;
-margin:15px 0;
-color:#fff;
+color:white;
 }
 
 .call{
-background:linear-gradient(90deg,#004cff,#1ad9ff);
+background:linear-gradient(90deg,#0051ff,#19d8ff);
 }
 
 .whats{
-background:#20f000;
+background:#25d900;
 }
 
 .date{
-margin-top:20px;
+margin-top:18px;
 font-size:22px;
+}
+
+@media(max-width:700px){
+#hospitalAr{font-size:30px;}
+#hospitalEn{font-size:18px;}
+#mainTitle{font-size:56px;}
+#specialtyName{font-size:34px;}
+#doctorName{font-size:26px;}
+#phone{font-size:22px;}
+.btn{font-size:28px;}
 }
 </style>
 </head>
@@ -118,11 +130,11 @@ font-size:22px;
 
 <div id="phone"></div>
 
-<a class="btn call" id="callBtn" href="#">📞 Call</a>
+<a id="callBtn" class="btn call" href="#">📞 Call</a>
 
-<a class="btn whats" id="waBtn" href="#">💬 WhatsApp</a>
+<a id="waBtn" class="btn whats" href="#">💬 WhatsApp</a>
 
-<div class="date" id="today"></div>
+<div id="today" class="date"></div>
 
 </div>
 
@@ -144,7 +156,7 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 const params = new URLSearchParams(window.location.search);
-const spec = params.get("spec") || "Emergency";
+const spec = (params.get("spec") || "Emergency Medicine").trim();
 
 document.getElementById("specialtyName").innerText = spec;
 
@@ -161,17 +173,29 @@ const data = snap.data();
 
 document.getElementById("hospitalAr").innerText = data.hospitalAr || "";
 document.getElementById("hospitalEn").innerText = data.hospitalEn || "";
+
 document.getElementById("doctorName").innerText = data["Doctor Name"] || "";
 document.getElementById("phone").innerText = data.phone || "";
 
-document.getElementById("callBtn").href = "tel:" + data.phone;
-document.getElementById("waBtn").href = "https://wa.me/" + data.whatsapp;
+document.getElementById("callBtn").href =
+"tel:" + (data.phone || "");
+
+document.getElementById("waBtn").href =
+"https://wa.me/" + (data.whatsapp || "");
+
+}else{
+
+document.getElementById("hospitalAr").innerText =
+"لا توجد بيانات";
 
 }
 
-}catch(e){
+}catch(error){
 
-document.getElementById("hospitalAr").innerText="خطأ بالاتصال";
+document.getElementById("hospitalAr").innerText =
+"خطأ بالاتصال";
+
+console.log(error);
 
 }
 
@@ -179,12 +203,12 @@ document.getElementById("hospitalAr").innerText="خطأ بالاتصال";
 
 loadDuty();
 
-const now=new Date();
+const now = new Date();
 
 document.getElementById("today").innerText =
 "Updated: "
-+ now.getDate()+"/"
-+ (now.getMonth()+1)+"/"
++ now.getDate() + "/"
++ (now.getMonth()+1) + "/"
 + now.getFullYear();
 
 </script>
