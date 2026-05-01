@@ -1,16 +1,16 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Dr_Duty</title>
+<title>Dr Duty Login</title>
 
 <style>
 *{
 margin:0;
 padding:0;
 box-sizing:border-box;
-font-family:Arial;
+font-family:Arial,sans-serif;
 }
 
 body{
@@ -18,116 +18,145 @@ height:100vh;
 display:flex;
 justify-content:center;
 align-items:center;
-background:
-linear-gradient(rgba(10,40,80,.55),rgba(10,40,80,.55)),
-url('https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1400&q=80');
-background-size:cover;
-background-position:center;
+background:url('https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=1200&q=80') center/cover no-repeat;
 overflow:hidden;
 }
 
 body::before{
-content:"✚ ⚕ 🏥 ✚ ⚕";
-position:absolute;
-font-size:80px;
-opacity:.08;
-letter-spacing:40px;
-top:10%;
-left:5%;
-animation:move 12s linear infinite;
-white-space:nowrap;
+content:'';
+position:fixed;
+inset:0;
+background:rgba(0,0,0,.45);
+backdrop-filter:blur(6px);
 }
 
-@keyframes move{
-0%{transform:translateX(0)}
-100%{transform:translateX(120px)}
-}
-
-.box{
-width:360px;
-padding:35px;
-border-radius:28px;
-background:rgba(255,255,255,.18);
-backdrop-filter:blur(16px);
-box-shadow:0 10px 35px rgba(0,0,0,.35);
-border:1px solid rgba(255,255,255,.25);
+.card{
+position:relative;
+z-index:2;
+width:92%;
+max-width:720px;
+padding:38px;
+border-radius:34px;
+background:rgba(255,255,255,.10);
+border:1px solid rgba(255,255,255,.20);
+box-shadow:0 0 35px rgba(0,255,255,.18);
 text-align:center;
-color:white;
+color:#fff;
 }
 
-.logo{
-font-size:48px;
-font-weight:bold;
+h1{
+font-size:76px;
+font-weight:800;
 margin-bottom:10px;
-text-shadow:0 0 10px rgba(255,255,255,.4);
+text-shadow:0 0 20px rgba(255,255,255,.25);
 }
 
 .sub{
-font-size:18px;
-margin-bottom:28px;
+font-size:24px;
 opacity:.95;
+margin-bottom:34px;
 }
 
 input{
 width:100%;
-padding:16px;
+padding:24px;
+font-size:38px;
 border:none;
 outline:none;
-border-radius:14px;
-font-size:20px;
+border-radius:22px;
 text-align:center;
-margin-bottom:18px;
-background:rgba(255,255,255,.85);
+margin-bottom:24px;
 }
 
 button{
 width:100%;
-padding:16px;
-border:none;
-border-radius:14px;
-font-size:24px;
+padding:24px;
+font-size:44px;
 font-weight:bold;
+border:none;
+border-radius:24px;
 cursor:pointer;
-background:linear-gradient(90deg,#4facfe,#00f2fe);
-color:white;
-box-shadow:0 8px 20px rgba(0,0,0,.25);
-}
-
-button:active{
-transform:scale(.98);
+color:#fff;
+background:linear-gradient(90deg,#2196f3,#00e5ff);
+box-shadow:0 15px 35px rgba(0,255,255,.25);
 }
 
 .note{
-margin-top:16px;
-font-size:14px;
+margin-top:22px;
+font-size:20px;
 opacity:.9;
+}
+
+.error{
+animation:shake .3s;
+}
+
+@keyframes shake{
+0%{transform:translateX(0)}
+25%{transform:translateX(-8px)}
+50%{transform:translateX(8px)}
+75%{transform:translateX(-8px)}
+100%{transform:translateX(0)}
+}
+
+@media(max-width:700px){
+h1{font-size:62px;}
+.sub{font-size:18px;}
+input{font-size:28px;padding:20px;}
+button{font-size:34px;padding:20px;}
 }
 </style>
 </head>
 
 <body>
 
-<div class="box">
-<div class="logo">Dr_Duty</div>
+<div class="card">
+
+<h1>Dr_Duty</h1>
+
 <div class="sub">Medical On-Call Portal</div>
 
 <input type="password" id="pass" placeholder="كلمة المرور">
 
-<button onclick="login()">دخول</button>
+<button onclick="login()" id="btn">دخول</button>
 
 <div class="note">Authorized Doctors Only</div>
+
 </div>
 
 <script>
-function login(){
-let p=document.getElementById("pass").value;
 
-if(p=="11223344"){
-window.location.href="portal.html";
+function login(){
+
+const password="54321";
+const val=document.getElementById("pass").value.trim();
+const btn=document.getElementById("btn");
+
+if(val===password){
+
+const params=new URLSearchParams(window.location.search);
+const spec=params.get("spec") || "Emergency Medicine";
+
+window.location.href=
+"portal.html?spec="+encodeURIComponent(spec);
+
 }else{
-alert("كلمة المرور غير صحيحة");
+
+btn.classList.remove("error");
+void btn.offsetWidth;
+btn.classList.add("error");
+
+document.getElementById("pass").value="";
+document.getElementById("pass").placeholder="كلمة المرور خطأ";
+
 }
+
 }
+
+document.getElementById("pass").addEventListener("keypress",function(e){
+if(e.key==="Enter") login();
+});
+
 </script>
 
 </body>
