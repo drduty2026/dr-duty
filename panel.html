@@ -3,155 +3,150 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Panel</title>
-
+<title>panel.html</title>
 <style>
-body{
-margin:0;
-font-family:Arial;
-background:#081a35;
-color:white;
-padding:20px;
-}
-.box{
-max-width:700px;
-margin:auto;
-background:#10284f;
-padding:20px;
-border-radius:20px;
-}
-.card{
-background:#173764;
-padding:20px;
-margin-top:20px;
-border-radius:20px;
-}
-input,select{
-width:100%;
-padding:14px;
-margin:8px 0;
-border:none;
-border-radius:10px;
-font-size:18px;
-}
-button{
-width:100%;
-padding:14px;
-background:#2563eb;
-color:white;
-border:none;
-border-radius:10px;
-font-size:18px;
-margin-top:10px;
-}
+body{margin:0;font-family:Arial;background:#081a35;color:#fff;padding:20px}
+.box{max-width:800px;margin:auto;background:#10284f;padding:20px;border-radius:20px}
+.card{background:#173764;padding:18px;border-radius:18px;margin-top:15px}
+input,select,button{width:100%;padding:14px;margin:8px 0;border:none;border-radius:10px;font-size:17px}
+button{background:#2563eb;color:#fff}
+.red{background:#dc2626}
 </style>
 </head>
-
 <body>
-
 <script>
-if(localStorage.getItem("login")!="yes"){
-window.location.href="admin.html";
-}
+if(localStorage.getItem("role")!="admin"){location.href="admin.html";}
 </script>
 
 <div class="box">
-
-<h1>Dr Duty Control Panel</h1>
+<h1>Admin Panel</h1>
 
 <div class="card">
 <h2>Add Hospital</h2>
-
 <input id="hospitalInput" placeholder="Hospital Name">
-<button onclick="saveHospital()">Save Hospital</button>
-
+<button onclick="addHospital()">Save Hospital</button>
 <select id="hospitalList"></select>
+<button class="red" onclick="deleteHospital()">Delete Selected Hospital</button>
 </div>
 
 <div class="card">
-<h2>Add Doctor</h2>
-
+<h2>Add / Edit Doctor</h2>
+<select id="doctorSelect" onchange="loadDoctor()"></select>
 <input id="docName" placeholder="Doctor Name">
 <input id="docPhone" placeholder="Phone Number">
 
+<select id="docSpec">
+<option>Emergency Medicine</option>
+<option>Surgery</option>
+<option>Internal Medicine</option>
+<option>Pediatrics</option>
+<option>Orthopedics</option>
+<option>ENT</option>
+<option>Ophthalmology</option>
+<option>Urology</option>
+<option>Cardiology</option>
+<option>Neurosurgery</option>
+<option>Radiology</option>
+<option>Dermatology</option>
+<option>Gynecology</option>
+<option>Anesthesia</option>
+<option>Psychiatry</option>
+<option>Oncology</option>
+<option>Nephrology</option>
+<option>Maxillofacial</option>
+<option>Pediatric Surgery</option>
+<option>Plastic Surgery</option>
+<option>Cardiovascular Surgery</option>
+<option>ICU</option>
+<option>CCU</option>
+<option>Medicine F Ward</option>
+<option>Medicine M Ward</option>
+<option>Surgery F Ward</option>
+<option>Surgery M Ward</option>
+<option>Dialysis Ward</option>
+<option>Oncology Ward</option>
+<option>Referral Doctor</option>
+<option>Emergency Ward Rotating Resident</option>
+<option>Evening Consultant</option>
+<option>Emergency Ward Intern Doctor</option>
+</select>
+
+<select id="docHospital"></select>
+
 <button onclick="saveDoctor()">Save Doctor</button>
-
-<select id="doctorList" onchange="showPhone()"></select>
-
-<input id="phoneShow" placeholder="Phone Number" readonly>
+<button class="red" onclick="deleteDoctor()">Delete Doctor</button>
 </div>
 
-<button onclick="logout()">Logout</button>
+<div class="card">
+<h2>Add Assistant</h2>
+<input id="aUser" placeholder="Username">
+<input id="aPass" placeholder="Password">
+<button onclick="addAssistant()">Save Assistant</button>
+</div>
 
+<button class="red" onclick="logout()">Logout</button>
 </div>
 
 <script>
+function getData(k){return JSON.parse(localStorage.getItem(k)||"[]")}
+function setData(k,v){localStorage.setItem(k,JSON.stringify(v))}
 
 function loadHospitals(){
-let data=JSON.parse(localStorage.getItem("hospitals")||"[]");
-let list=document.getElementById("hospitalList");
-list.innerHTML="";
-data.forEach(h=>{
-list.innerHTML += "<option>"+h+"</option>";
+let arr=getData("hospitals");
+hospitalList.innerHTML="";
+docHospital.innerHTML="";
+arr.forEach(x=>{
+hospitalList.innerHTML+=<option>${x}</option>;
+docHospital.innerHTML+=<option>${x}</option>;
 });
 }
 
-function saveHospital(){
-let name=document.getElementById("hospitalInput").value.trim();
-if(name=="") return;
+function addHospital(){
+let v=hospitalInput.value.trim();
+if(v=="")return;
+let arr=getData("hospitals");
+arr.push(v);
+setData("hospitals",arr);
+hospitalInput.value="";
+loadHospitals();
+}
 
-let data=JSON.parse(localStorage.getItem("hospitals")||"[]");
-data.push(name);
-localStorage.setItem("hospitals",JSON.stringify(data));
-document.getElementById("hospitalInput").value="";
+function deleteHospital(){
+let arr=getData("hospitals");
+arr=arr.filter(x=>x!=hospitalList.value);
+setData("hospitals",arr);
 loadHospitals();
 }
 
 function loadDoctors(){
-let data=JSON.parse(localStorage.getItem("doctors")||"[]");
-let list=document.getElementById("doctorList");
-list.innerHTML="";
-data.forEach(d=>{
-list.innerHTML += "<option>"+d.name+"</option>";
+let arr=getData("doctors");
+doctorSelect.innerHTML="<option>Select Doctor</option>";
+arr.forEach(x=>{
+doctorSelect.innerHTML+=<option>${x.name}</option>;
 });
 }
 
 function saveDoctor(){
-let name=document.getElementById("docName").value.trim();
-let phone=document.getElementById("docPhone").value.trim();
-
-if(name==""||phone=="") return;
-
-let data=JSON.parse(localStorage.getItem("doctors")||"[]");
-data.push({name:name,phone:phone});
-localStorage.setItem("doctors",JSON.stringify(data));
-
-document.getElementById("docName").value="";
-document.getElementById("docPhone").value="";
-
+let arr=getData("doctors");
+let obj={
+name:docName.value,
+phone:docPhone.value,
+spec:docSpec.value,
+hospital:docHospital.value
+};
+arr=arr.filter(x=>x.name!=obj.name);
+arr.push(obj);
+setData("doctors",arr);
 loadDoctors();
+alert("Saved");
 }
 
-function showPhone(){
-let name=document.getElementById("doctorList").value;
-let data=JSON.parse(localStorage.getItem("doctors")||"[]");
-
-for(let i=0;i<data.length;i++){
-if(data[i].name==name){
-document.getElementById("phoneShow").value=data[i].phone;
+function loadDoctor(){
+let arr=getData("doctors");
+let d=arr.find(x=>x.name==doctorSelect.value);
+if(!d)return;
+docName.value=d.name;
+docPhone.value=d.phone;
+docSpec.value=d.spec;
+docHospital.value=d.hospital;
 }
-}
-}
-
-function logout(){
-localStorage.removeItem("login");
-window.location.href="admin.html";
-}
-
-loadHospitals();
-loadDoctors();
-
-</script>
-
-</body>
-</html>
