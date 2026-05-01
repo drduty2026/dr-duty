@@ -190,7 +190,8 @@ window.saveDoctor = async function(){
 await setDoc(doc(db,"doctors",docName.value),{
 name:docName.value,
 specialty:docSpec.value,
-phone:docPhone.value
+phone:docPhone.value,
+hospital:hospitalName.value
 });
 
 alert("Doctor Saved");
