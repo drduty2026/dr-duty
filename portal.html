@@ -156,7 +156,9 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 const params = new URLSearchParams(window.location.search);
-const spec = (params.get("spec") || "Emergency Medicine").trim();
+let spec = (params.get("spec") || "Emergency Medicine").trim();
+
+spec = decodeURIComponent(spec);
 
 document.getElementById("specialtyName").innerText = spec;
 
@@ -171,22 +173,31 @@ if(snap.exists()){
 
 const data = snap.data();
 
-document.getElementById("hospitalAr").innerText = data.hospitalAr || "";
-document.getElementById("hospitalEn").innerText = data.hospitalEn || "";
+document.getElementById("hospitalAr").innerText =
+data.hospitalAr || "";
 
-document.getElementById("doctorName").innerText = data["Doctor Name"] || "";
-document.getElementById("phone").innerText = data.phone || "";
+document.getElementById("hospitalEn").innerText =
+data.hospitalEn || "";
+
+document.getElementById("doctorName").innerText =
+data["Doctor Name"] || "";
+
+document.getElementById("phone").innerText =
+data.phone || "";
 
 document.getElementById("callBtn").href =
 "tel:" + (data.phone || "");
 
 document.getElementById("waBtn").href =
-"https://wa.me/" + (data.whatsapp || "");
+"https://wa.me/" + (data.whatsapp  data.phone  "");
 
 }else{
 
 document.getElementById("hospitalAr").innerText =
 "لا توجد بيانات";
+
+document.getElementById("doctorName").innerText = "";
+document.getElementById("phone").innerText = "";
 
 }
 
