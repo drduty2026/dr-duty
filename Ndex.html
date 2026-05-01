@@ -1,1 +1,68 @@
 
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dr_Duty</title>
+<style>
+body{
+margin:0;
+font-family:Arial;
+background:#0d0d0d;
+color:white;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+}
+.box{
+width:340px;
+padding:25px;
+border-radius:25px;
+background:#151515;
+box-shadow:0 0 30px rgba(0,255,180,.25);
+text-align:center;
+}
+input{
+width:90%;
+padding:12px;
+margin:10px 0;
+border:none;
+border-radius:12px;
+font-size:18px;
+text-align:center;
+}
+button{
+padding:12px 25px;
+border:none;
+border-radius:12px;
+background:#00c896;
+color:white;
+font-size:18px;
+cursor:pointer;
+}
+h1{margin-bottom:20px;}
+</style>
+</head>
+<body>
+
+<div class="box">
+<h1>Dr_Duty</h1>
+<input type="password" id="pass" placeholder="كلمة المرور">
+<br>
+<button onclick="login()">دخول</button>
+</div>
+
+<script>
+function login(){
+if(document.getElementById("pass").value=="11223344"){
+window.location="portal.html";
+}else{
+alert("كلمة المرور خاطئة");
+}
+}
+</script>
+
+</body>
+</html>
