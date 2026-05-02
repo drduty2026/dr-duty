@@ -39,9 +39,14 @@ button{
 background:#2563eb;
 color:white;
 font-weight:bold;
+cursor:pointer;
 }
 .red{background:#dc2626;}
 .green{background:#16a34a;}
+#doctorSuggestions{
+display:none;
+max-height:220px;
+}
 </style>
 </head>
 
@@ -73,10 +78,9 @@ font-weight:bold;
 
 <select id="spec"></select>
 
-<input id="doctorName" placeholder="Doctor Name"
-list="doctorSuggestions" oninput="searchDoctor()">
+<input id="doctorName" placeholder="Doctor Name" oninput="searchDoctor()">
 
-<datalist id="doctorSuggestions"></datalist>
+<select id="doctorSuggestions" size="5" onclick="chooseDoctor()"></select>
 
 <input id="doctorPhone" placeholder="Phone Number">
 
@@ -144,8 +148,7 @@ const arr = [
 ];
 
 for(let i=0;i<arr.length;i++){
-document.getElementById("spec").innerHTML +=
-"<option>"+arr[i]+"</option>";
+document.getElementById("spec").innerHTML += "<option>"+arr[i]+"</option>";
 }
 
 /* SAVE DOCTOR */
@@ -170,14 +173,22 @@ alert("Doctor Saved");
 
 }
 
-/* SEARCH DOCTOR */
+/* REAL SEARCH LIST */
 function searchDoctor(){
 
 let q=document.getElementById("doctorName").value.trim();
+let list=document.getElementById("doctorSuggestions");
+
+list.innerHTML="";
+
+if(q===""){
+list.style.display="none";
+return;
+}
 
 db.collection("Doctors").get().then(snap=>{
 
-document.getElementById("doctorSuggestions").innerHTML="";
+let found=0;
 
 snap.forEach(doc=>{
 
@@ -185,18 +196,37 @@ let d=doc.data();
 
 if(d.name.toLowerCase().startsWith(q.toLowerCase())){
 
-document.getElementById("doctorSuggestions").innerHTML +=
-'<option value="'+d.name+'">';
+list.innerHTML +=
+'<option value="'+d.name+'">'+d.name+'</option>';
 
-}
-
-if(d.name.toLowerCase()===q.toLowerCase()){
-
-document.getElementById("doctorPhone").value=d.phone;
+found++;
 
 }
 
 });
+
+list.style.display = found ? "block" : "none";
+
+});
+
+}
+
+function chooseDoctor(){
+
+let list=document.getElementById("doctorSuggestions");
+let n=list.value;
+
+document.getElementById("doctorName").value=n;
+list.style.display="none";
+
+db.collection("Doctors").doc(n).get().then(doc=>{
+
+if(doc.exists){
+
+document.getElementById("doctorPhone").value =
+doc.data().phone;
+
+}
 
 });
 
