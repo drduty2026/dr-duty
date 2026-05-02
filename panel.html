@@ -10,7 +10,7 @@ body{
 margin:0;
 font-family:Arial,sans-serif;
 background:#081a35;
-color:#fff;
+color:white;
 padding:20px;
 }
 .box{
@@ -37,86 +37,78 @@ box-sizing:border-box;
 }
 button{
 background:#2563eb;
-color:#fff;
+color:white;
 font-weight:bold;
 cursor:pointer;
 }
 .red{background:#dc2626;}
 .green{background:#16a34a;}
-.orange{background:#ea580c;}
 </style>
 </head>
 
 <body>
-
-<script>
-if(localStorage.getItem("session")!=="admin"){
-location.href="admin.html";
-}
-</script>
 
 <div class="box">
 
 <h1>Dr Duty Admin Panel</h1>
 
 <div class="card">
-<h2>Hospitals</h2>
 
-<input id="hospitalInput" placeholder="Hospital Name">
+<h2>Update Duty</h2>
 
-<button onclick="addHospital()">Add Hospital</button>
+<select id="spec"></select>
 
-<select id="hospitalList"></select>
+<input id="name" placeholder="Doctor Name">
 
-<button class="red" onclick="deleteHospital()">Delete Hospital</button>
-</div>
-
-<div class="card">
-<h2>Doctors Duty</h2>
-
-<select id="specList"></select>
-
-<input id="doctorName" placeholder="Doctor Name">
-
-<input id="doctorPhone" placeholder="Phone Number">
-
-<select id="doctorHospital"></select>
+<input id="phone" placeholder="Phone Number">
 
 <button onclick="saveDuty()">Save Duty</button>
+
 </div>
 
 <div class="card">
-<h2>Assistants</h2>
 
-<input id="aUser" placeholder="Assistant Name">
+<h2>Add Assistant</h2>
 
-<input id="aPass" placeholder="Password">
+<input id="auser" placeholder="Username">
 
-<button class="green" onclick="addAssistant()">Add Assistant</button>
+<input id="apass" placeholder="Password">
 
-<select id="assistantList"></select>
+<button class="green" onclick="addAssistant()">Save Assistant</button>
 
-<button class="orange" onclick="toggleAssistant()">Disable / Enable</button>
-
-<button class="red" onclick="deleteAssistant()">Delete Assistant</button>
 </div>
 
 <button class="red" onclick="logout()">Logout</button>
 
 </div>
 
-<script>
+<script type="module">
 
-/* DATA HELPERS */
-function getData(k){
-return JSON.parse(localStorage.getItem(k)||"[]");
-}
-function setData(k,v){
-localStorage.setItem(k,JSON.stringify(v));
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+getFirestore,
+doc,
+setDoc
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+if(localStorage.getItem("role")!=="admin"){
+location.href="admin.html";
 }
 
-/* 33 SPECIALTIES */
-const specs=[
+const firebaseConfig = {
+apiKey: "AIzaSyDQqQpACfdiq-i1q-hv9auGjEkSeHhMIuc",
+authDomain: "dr-duty.firebaseapp.com",
+projectId: "dr-duty",
+storageBucket: "dr-duty.firebasestorage.app",
+messagingSenderId: "1051471488231",
+appId: "1:1051471488231:web:d9abfafee31373ec826e42"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const specs = [
 "Emergency Medicine",
 "Surgery",
 "Internal Medicine",
@@ -153,127 +145,45 @@ const specs=[
 ];
 
 specs.forEach(x=>{
-specList.innerHTML += <option>${x}</option>;
+document.getElementById("spec").innerHTML += <option>${x}</option>;
 });
 
-/* HOSPITALS */
-function loadHospitals(){
-let arr=getData("hospitals");
+window.saveDuty = async function(){
 
-hospitalList.innerHTML="";
-doctorHospital.innerHTML="";
+let s=spec.value;
+let n=name.value;
+let p=phone.value;
 
-arr.forEach(x=>{
-hospitalList.innerHTML += <option>${x}</option>;
-doctorHospital.innerHTML += <option>${x}</option>;
+await setDoc(doc(db,"Duties",s),{
+name:n,
+phone:p,
+spec:s,
+updated:new Date().toLocaleDateString()
 });
-}
-
-function addHospital(){
-let v=hospitalInput.value.trim();
-if(v==="") return;
-
-let arr=getData("hospitals");
-arr.push(v);
-setData("hospitals",arr);
-
-hospitalInput.value="";
-loadHospitals();
-alert("Hospital Added");
-}
-
-function deleteHospital(){
-let arr=getData("hospitals").filter(x=>x!==hospitalList.value);
-setData("hospitals",arr);
-loadHospitals();
-alert("Deleted");
-}
-
-/* DUTIES */
-function saveDuty(){
-
-let arr=getData("duties");
-
-arr=arr.filter(x=>x.spec!==specList.value);
-
-arr.push({
-spec:specList.value,
-name:doctorName.value,
-phone:doctorPhone.value,
-hospital:doctorHospital.value
-});
-
-setData("duties",arr);
 
 alert("Saved Successfully");
+
 }
 
-/* ASSISTANTS */
-function loadAssistants(){
-let arr=getData("assistants");
+window.addAssistant = async function(){
 
-assistantList.innerHTML="";
+let u=auser.value.trim();
+let p=apass.value.trim();
 
-arr.forEach(x=>{
-assistantList.innerHTML += <option>${x.user}</option>;
-});
-}
-
-function addAssistant(){
-
-let arr=getData("assistants");
-
-arr.push({
-user:aUser.value,
-pass:aPass.value,
+await setDoc(doc(db,"Assistants",u),{
+username:u,
+password:p,
 active:true
 });
 
-setData("assistants",arr);
+alert("Assistant Saved");
 
-aUser.value="";
-aPass.value="";
-
-loadAssistants();
-
-alert("Assistant Added");
 }
 
-function toggleAssistant(){
-
-let arr=getData("assistants");
-
-arr.forEach(x=>{
-if(x.user===assistantList.value){
-x.active=!x.active;
-}
-});
-
-setData("assistants",arr);
-
-alert("Updated");
-}
-
-function deleteAssistant(){
-
-let arr=getData("assistants").filter(x=>x.user!==assistantList.value);
-
-setData("assistants",arr);
-
-loadAssistants();
-
-alert("Deleted");
-}
-
-/* LOGOUT */
-function logout(){
-localStorage.removeItem("session");
+window.logout=function(){
+localStorage.removeItem("role");
 location.href="admin.html";
 }
-
-/* START */
-loadHospitals();
-loadAssistants();
 
 </script>
 
