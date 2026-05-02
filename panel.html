@@ -43,10 +43,6 @@ cursor:pointer;
 }
 .red{background:#dc2626;}
 .green{background:#16a34a;}
-#doctorSuggestions{
-display:none;
-max-height:220px;
-}
 </style>
 </head>
 
@@ -56,6 +52,7 @@ max-height:220px;
 
 <h1>Dr Duty Admin Panel</h1>
 
+<!-- Doctor Directory -->
 <div class="card">
 <h2>Doctor Directory</h2>
 
@@ -65,6 +62,7 @@ max-height:220px;
 <button class="green" onclick="saveDoctor()">Save Doctor</button>
 </div>
 
+<!-- Hospital -->
 <div class="card">
 <h2>Add Hospital</h2>
 
@@ -73,14 +71,17 @@ max-height:220px;
 <button onclick="saveHospital()">Save Hospital</button>
 </div>
 
+<!-- Duty -->
 <div class="card">
 <h2>Update Duty</h2>
 
 <select id="spec"></select>
 
-<input id="doctorName" placeholder="Doctor Name" oninput="searchDoctor()">
+<select id="savedDoctors" onchange="fillDoctor()">
+<option value="">Select Saved Doctor</option>
+</select>
 
-<select id="doctorSuggestions" size="5" onclick="chooseDoctor()"></select>
+<input id="doctorName" placeholder="Doctor Name (or type manually)">
 
 <input id="doctorPhone" placeholder="Phone Number">
 
@@ -89,6 +90,7 @@ max-height:220px;
 <button onclick="saveDuty()">Save Duty</button>
 </div>
 
+<!-- Assistant -->
 <div class="card">
 <h2>Add Assistant</h2>
 
@@ -98,6 +100,7 @@ max-height:220px;
 <button class="green" onclick="saveAssistant()">Save Assistant</button>
 </div>
 
+<!-- Assistant Manager -->
 <div class="card">
 <h2>Assistants Manager</h2>
 
@@ -148,14 +151,14 @@ const arr = [
 ];
 
 for(let i=0;i<arr.length;i++){
-document.getElementById("spec").innerHTML += "<option>"+arr[i]+"</option>";
+spec.innerHTML += "<option>"+arr[i]+"</option>";
 }
 
 /* SAVE DOCTOR */
 function saveDoctor(){
 
-let n=document.getElementById("saveDoctorName").value.trim();
-let p=document.getElementById("saveDoctorPhone").value.trim();
+let n=saveDoctorName.value.trim();
+let p=saveDoctorPhone.value.trim();
 
 if(n==="") return;
 
@@ -164,67 +167,49 @@ name:n,
 phone:p
 }).then(()=>{
 
-document.getElementById("saveDoctorName").value="";
-document.getElementById("saveDoctorPhone").value="";
-
+saveDoctorName.value="";
+saveDoctorPhone.value="";
+loadDoctors();
 alert("Doctor Saved");
 
 });
 
 }
 
-/* REAL SEARCH LIST */
-function searchDoctor(){
+/* LOAD DOCTORS */
+function loadDoctors(){
 
-let q=document.getElementById("doctorName").value.trim();
-let list=document.getElementById("doctorSuggestions");
-
-list.innerHTML="";
-
-if(q===""){
-list.style.display="none";
-return;
-}
+savedDoctors.innerHTML =
+'<option value="">Select Saved Doctor</option>';
 
 db.collection("Doctors").get().then(snap=>{
 
-let found=0;
-
 snap.forEach(doc=>{
 
-let d=doc.data();
-
-if(d.name.toLowerCase().startsWith(q.toLowerCase())){
-
-list.innerHTML +=
-'<option value="'+d.name+'">'+d.name+'</option>';
-
-found++;
-
-}
+savedDoctors.innerHTML +=
+'<option value="'+doc.id+'">'+doc.id+'</option>';
 
 });
-
-list.style.display = found ? "block" : "none";
 
 });
 
 }
 
-function chooseDoctor(){
+/* SELECT DOCTOR */
+function fillDoctor(){
 
-let list=document.getElementById("doctorSuggestions");
-let n=list.value;
+let n=savedDoctors.value;
 
-document.getElementById("doctorName").value=n;
-list.style.display="none";
+if(n==="") return;
 
 db.collection("Doctors").doc(n).get().then(doc=>{
 
 if(doc.exists){
 
-document.getElementById("doctorPhone").value =
-doc.data().phone;
+let d=doc.data();
+
+doctorName.value=d.name;
+doctorPhone.value=d.phone;
 
 }
 
@@ -232,15 +217,15 @@ doc.data().phone;
 
 }
 
-/* LOAD HOSPITALS */
+/* HOSPITALS */
 function loadHospitals(){
 
-document.getElementById("hospitalList").innerHTML="";
+hospitalList.innerHTML="";
 
 db.collection("Hospitals").get().then(snap=>{
 
 snap.forEach(doc=>{
-document.getElementById("hospitalList").innerHTML +=
+hospitalList.innerHTML +=
 "<option>"+doc.id+"</option>";
 });
 
@@ -248,10 +233,9 @@ document.getElementById("hospitalList").innerHTML +=
 
 }
 
-/* SAVE HOSPITAL */
 function saveHospital(){
 
-let h=document.getElementById("hospitalName").value.trim();
+let h=hospitalName.value.trim();
 
 if(h==="") return;
 
@@ -259,27 +243,22 @@ db.collection("Hospitals").doc(h).set({
 name:h
 }).then(()=>{
 
-document.getElementById("hospitalName").value="";
+hospitalName.value="";
 loadHospitals();
-
 alert("Hospital Saved");
 
 });
 
 }
 
-/* SAVE DUTY */
+/* DUTY */
 function saveDuty(){
 
-db.collection("Duties").doc(
-document.getElementById("spec").value
-).set({
-
-spec:document.getElementById("spec").value,
-name:document.getElementById("doctorName").value,
-phone:document.getElementById("doctorPhone").value,
-hospital:document.getElementById("hospitalList").value
-
+db.collection("Duties").doc(spec.value).set({
+spec:spec.value,
+name:doctorName.value,
+phone:doctorPhone.value,
+hospital:hospitalList.value
 }).then(()=>{
 
 alert("Duty Saved");
@@ -288,17 +267,13 @@ alert("Duty Saved");
 
 }
 
-/* SAVE ASSISTANT */
+/* ASSISTANTS */
 function saveAssistant(){
 
-db.collection("Assistants").doc(
-document.getElementById("auser").value
-).set({
-
-username:document.getElementById("auser").value,
-password:document.getElementById("apass").value,
+db.collection("Assistants").doc(auser.value).set({
+username:auser.value,
+password:apass.value,
 active:true
-
 }).then(()=>{
 
 alert("Assistant Saved");
@@ -308,19 +283,18 @@ loadAssistants();
 
 }
 
-/* LOAD ASSISTANTS */
 function loadAssistants(){
 
-document.getElementById("assistantList").innerHTML="";
+assistantList.innerHTML="";
 
 db.collection("Assistants").get().then(snap=>{
 
-document.getElementById("assistantCount").innerHTML =
+assistantCount.innerHTML =
 "Assistants: " + snap.size;
 
 snap.forEach(doc=>{
 
-document.getElementById("assistantList").innerHTML +=
+assistantList.innerHTML +=
 "<option>"+doc.id+"</option>";
 
 });
@@ -329,10 +303,9 @@ document.getElementById("assistantList").innerHTML +=
 
 }
 
-/* DELETE ASSISTANT */
 function deleteAssistant(){
 
-let u=document.getElementById("assistantList").value;
+let u=assistantList.value;
 
 if(!u) return;
 
@@ -352,6 +325,7 @@ location.href="admin.html";
 }
 
 /* START */
+loadDoctors();
 loadHospitals();
 loadAssistants();
 
