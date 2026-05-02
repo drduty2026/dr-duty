@@ -8,13 +8,13 @@
 <style>
 body{
 margin:0;
-font-family:Arial;
+font-family:Arial,sans-serif;
 background:#081a44;
 display:flex;
 justify-content:center;
 align-items:center;
 height:100vh;
-color:white;
+color:#fff;
 }
 .box{
 width:90%;
@@ -24,7 +24,10 @@ padding:30px;
 border-radius:20px;
 box-shadow:0 0 20px rgba(0,0,0,.3);
 }
-h1{text-align:center;margin-bottom:25px;}
+h1{
+text-align:center;
+margin-bottom:20px;
+}
 input{
 width:100%;
 padding:14px;
@@ -37,11 +40,11 @@ box-sizing:border-box;
 button{
 width:100%;
 padding:14px;
-margin-top:12px;
+margin-top:10px;
 border:none;
 border-radius:10px;
 background:#1f6bff;
-color:white;
+color:#fff;
 font-size:18px;
 font-weight:bold;
 cursor:pointer;
@@ -63,48 +66,39 @@ cursor:pointer;
 </div>
 
 <script>
-
-/* Auto login if already signed in */
-if(localStorage.getItem("loggedIn")=="yes"){
-
-if(localStorage.getItem("role")=="admin"){
+/* Auto Redirect */
+if(localStorage.getItem("session")=="admin"){
 location.href="panel.html";
-}else{
+}
+if(localStorage.getItem("session")=="assistant"){
 location.href="assistant.html";
 }
 
-}
-
+/* Login */
 function login(){
 
 let u=document.getElementById("user").value.trim();
 let p=document.getElementById("pass").value.trim();
 
-/* Admin Login */
-if(u=="admin" && p=="1234"){
-
-localStorage.setItem("loggedIn","yes");
-localStorage.setItem("role","admin");
-
+/* Main Admin */
+if(u==="admin" && p==="1234"){
+localStorage.setItem("session","admin");
 location.href="panel.html";
 return;
 }
 
-/* Assistant Login */
+/* Assistant Accounts */
 let arr=JSON.parse(localStorage.getItem("assistants")||"[]");
 
-let found=arr.find(x=>
-x.user==u &&
-x.pass==p &&
-x.active==true
+let found=arr.find(x =>
+x.user===u &&
+x.pass===p &&
+x.active===true
 );
 
 if(found){
-
-localStorage.setItem("loggedIn","yes");
-localStorage.setItem("role","assistant");
+localStorage.setItem("session","assistant");
 localStorage.setItem("assistantName",u);
-
 location.href="assistant.html";
 return;
 }
