@@ -36,6 +36,7 @@ button{
 background:#2563eb;
 color:white;
 font-weight:bold;
+cursor:pointer;
 }
 </style>
 </head>
@@ -43,12 +44,14 @@ font-weight:bold;
 <body>
 
 <div class="box">
+
 <h1>Dr Duty Login</h1>
 
 <input id="user" placeholder="Username">
 <input id="pass" type="password" placeholder="Password">
 
 <button onclick="login()">Login</button>
+
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -73,26 +76,56 @@ function login(){
 let u=user.value.trim();
 let p=pass.value.trim();
 
-if(u==="admin" && p==="1234"){
-localStorage.setItem("role","admin");
-location.href="panel.html";
-return;
-}
-
-db.collection("Assistants").doc(u).get().then(doc=>{
+/* ADMIN FROM FIREBASE */
+db.collection("Admins").doc("main").get().then(doc=>{
 
 if(doc.exists){
 
 let d=doc.data();
 
-if(d.password===p && d.active===true){
+if(d.username===u && d.password===p){
+
+localStorage.setItem("role","admin");
+location.href="panel.html";
+return;
+
+}
+
+}else{
+
+/* DEFAULT ADMIN */
+
+if(u==="admin" && p==="1234"){
+
+localStorage.setItem("role","admin");
+location.href="panel.html";
+return;
+
+}
+
+}
+
+/* ASSISTANTS */
+
+db.collection("Assistants").doc(u).get().then(adoc=>{
+
+if(adoc.exists){
+
+let a=adoc.data();
+
+if(a.password===p && a.active===true){
+
 localStorage.setItem("role","assistant");
 location.href="assistant.html";
 return;
+
 }
+
 }
 
 alert("Wrong Login");
+
+});
 
 });
 
