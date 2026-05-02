@@ -41,8 +41,8 @@ color:white;
 font-weight:bold;
 cursor:pointer;
 }
-.red{background:#dc2626;}
 .green{background:#16a34a;}
+.red{background:#dc2626;}
 </style>
 </head>
 
@@ -60,9 +60,15 @@ cursor:pointer;
 <input id="saveDoctorPhone" placeholder="Phone Number">
 
 <button class="green" onclick="saveDoctor()">Save Doctor</button>
+
+<select id="deleteDoctorList">
+<option value="">Select Doctor To Delete</option>
+</select>
+
+<button class="red" onclick="deleteDoctor()">Delete Doctor</button>
 </div>
 
-<!-- Hospital -->
+<!-- Add Hospital -->
 <div class="card">
 <h2>Add Hospital</h2>
 
@@ -71,7 +77,7 @@ cursor:pointer;
 <button onclick="saveHospital()">Save Hospital</button>
 </div>
 
-<!-- Duty -->
+<!-- Update Duty -->
 <div class="card">
 <h2>Update Duty</h2>
 
@@ -81,7 +87,7 @@ cursor:pointer;
 <option value="">Select Saved Doctor</option>
 </select>
 
-<input id="doctorName" placeholder="Doctor Name (or type manually)">
+<input id="doctorName" placeholder="Doctor Name">
 <input id="doctorPhone" placeholder="Phone Number">
 
 <select id="hospitalList"></select>
@@ -89,7 +95,7 @@ cursor:pointer;
 <button onclick="saveDuty()">Save Duty</button>
 </div>
 
-<!-- Assistant -->
+<!-- Add Assistant -->
 <div class="card">
 <h2>Add Assistant</h2>
 
@@ -99,7 +105,7 @@ cursor:pointer;
 <button class="green" onclick="saveAssistant()">Save Assistant</button>
 </div>
 
-<!-- Assistants -->
+<!-- Assistant Manager -->
 <div class="card">
 <h2>Assistants Manager</h2>
 
@@ -110,16 +116,14 @@ cursor:pointer;
 <button class="red" onclick="deleteAssistant()">Delete Assistant</button>
 </div>
 
-<!-- ADMIN SECURITY -->
-<div class="card" id="adminSecurity">
+<!-- Admin Security -->
+<div class="card">
 <h2>Admin Security</h2>
 
 <input id="newAdminUser" placeholder="New Username">
 <input id="newAdminPass" placeholder="New Password">
 
-<button class="green" onclick="changeAdminLogin()">
-Save Changes
-</button>
+<button class="green" onclick="changeAdminLogin()">Save Changes</button>
 </div>
 
 <button class="red" onclick="logout()">Logout</button>
@@ -136,18 +140,18 @@ location.href="admin.html";
 }
 
 const firebaseConfig = {
-apiKey: "AIzaSyDQqQpACfdiq-i1q-hv9auGjEkSeHhMIuc",
-authDomain: "dr-duty.firebaseapp.com",
-projectId: "dr-duty",
-storageBucket: "dr-duty.firebasestorage.app",
-messagingSenderId: "1051471488231",
-appId: "1:1051471488231:web:d9abfafee31373ec826e42"
+apiKey:"AIzaSyDQqQpACfdiq-i1q-hv9auGjEkSeHhMIuc",
+authDomain:"dr-duty.firebaseapp.com",
+projectId:"dr-duty",
+storageBucket:"dr-duty.firebasestorage.app",
+messagingSenderId:"1051471488231",
+appId:"1:1051471488231:web:d9abfafee31373ec826e42"
 };
 
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-/* SPECIALTIES */
+/* Specialties */
 const arr = [
 "Emergency Medicine","Surgery","Internal Medicine","Pediatrics",
 "Orthopedics","ENT","Ophthalmology","Urology","Cardiology",
@@ -165,7 +169,7 @@ for(let i=0;i<arr.length;i++){
 spec.innerHTML += "<option>"+arr[i]+"</option>";
 }
 
-/* SAVE DOCTOR */
+/* Save Doctor */
 function saveDoctor(){
 
 let n=saveDoctorName.value.trim();
@@ -178,16 +182,19 @@ name:n,
 phone:p
 }).then(()=>{
 
+alert("Doctor Saved");
+
 saveDoctorName.value="";
 saveDoctorPhone.value="";
+
 loadDoctors();
-alert("Doctor Saved");
+loadDeleteDoctors();
 
 });
 
 }
 
-/* LOAD DOCTORS */
+/* Load Doctors */
 function loadDoctors(){
 
 savedDoctors.innerHTML =
@@ -206,11 +213,10 @@ savedDoctors.innerHTML +=
 
 }
 
-/* FILL DOCTOR */
+/* Fill Doctor */
 function fillDoctor(){
 
 let n=savedDoctors.value;
-
 if(n==="") return;
 
 db.collection("Doctors").doc(n).get().then(doc=>{
@@ -226,7 +232,49 @@ doctorPhone.value=doc.data().phone;
 
 }
 
-/* HOSPITALS */
+/* Delete Doctor List */
+function loadDeleteDoctors(){
+
+deleteDoctorList.innerHTML =
+'<option value="">Select Doctor To Delete</option>';
+
+db.collection("Doctors").get().then(snap=>{
+
+snap.forEach(doc=>{
+
+deleteDoctorList.innerHTML +=
+'<option value="'+doc.id+'">'+doc.id+'</option>';
+
+});
+
+});
+
+}
+
+/* Delete Doctor */
+function deleteDoctor(){
+
+let n=deleteDoctorList.value;
+
+if(n===""){
+alert("Select Doctor");
+return;
+}
+
+if(!confirm("Delete "+n+" ?")) return;
+
+db.collection("Doctors").doc(n).delete().then(()=>{
+
+alert("Doctor Deleted");
+
+loadDoctors();
+loadDeleteDoctors();
+
+});
+
+}
+
+/* Hospitals */
 function loadHospitals(){
 
 hospitalList.innerHTML="";
@@ -252,15 +300,15 @@ db.collection("Hospitals").doc(h).set({
 name:h
 }).then(()=>{
 
+alert("Hospital Saved");
 hospitalName.value="";
 loadHospitals();
-alert("Hospital Saved");
 
 });
 
 }
 
-/* DUTY */
+/* Duty */
 function saveDuty(){
 
 db.collection("Duties").doc(spec.value).set({
@@ -276,7 +324,7 @@ alert("Duty Saved");
 
 }
 
-/* ASSISTANTS */
+/* Assistants */
 function saveAssistant(){
 
 db.collection("Assistants").doc(auser.value).set({
@@ -286,6 +334,10 @@ active:true
 }).then(()=>{
 
 alert("Assistant Saved");
+
+auser.value="";
+apass.value="";
+
 loadAssistants();
 
 });
@@ -299,7 +351,7 @@ assistantList.innerHTML="";
 db.collection("Assistants").get().then(snap=>{
 
 assistantCount.innerHTML =
-"Assistants: " + snap.size;
+"Assistants: "+snap.size;
 
 snap.forEach(doc=>{
 
@@ -327,7 +379,7 @@ loadAssistants();
 
 }
 
-/* ADMIN LOGIN CHANGE */
+/* Admin Security */
 function changeAdminLogin(){
 
 let u=newAdminUser.value.trim();
@@ -352,14 +404,17 @@ newAdminPass.value="";
 
 }
 
-/* LOGOUT */
+/* Logout */
 function logout(){
+
 localStorage.removeItem("role");
 location.href="admin.html";
+
 }
 
-/* START */
+/* Start */
 loadDoctors();
+loadDeleteDoctors();
 loadHospitals();
 loadAssistants();
 
