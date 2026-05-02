@@ -38,7 +38,7 @@ color:white;
 box-sizing:border-box;
 }
 h1{
-font-size:54px;
+font-size:44px;
 margin:0;
 font-weight:800;
 }
@@ -47,14 +47,14 @@ font-size:18px;
 margin-top:8px;
 opacity:.95;
 }
-input{
+input,select{
 width:100%;
 padding:18px;
 border:none;
 border-radius:18px;
-font-size:26px;
+font-size:22px;
 text-align:center;
-margin-top:28px;
+margin-top:20px;
 box-sizing:border-box;
 }
 button,a{
@@ -64,27 +64,16 @@ text-decoration:none;
 padding:18px;
 border:none;
 border-radius:18px;
-font-size:26px;
+font-size:24px;
 font-weight:700;
 margin-top:18px;
 cursor:pointer;
 box-sizing:border-box;
 color:white;
 }
-.loginBtn{
-background:linear-gradient(90deg,#4ea3ff,#12d8f0);
-}
-.call{
-background:linear-gradient(90deg,#0f55ff,#26d9ff);
-}
-.whatsapp{
-background:#2cff00;
-}
-.small{
-margin-top:20px;
-font-size:14px;
-opacity:.9;
-}
+.loginBtn{background:linear-gradient(90deg,#4ea3ff,#12d8f0);}
+.call{background:linear-gradient(90deg,#0f55ff,#26d9ff);}
+.whatsapp{background:#2cff00;}
 .spec{
 font-size:28px;
 color:#28dcff;
@@ -95,9 +84,12 @@ margin-top:10px;
 margin-top:10px;
 font-size:20px;
 }
-#infoBox{
-display:none;
+.small{
+margin-top:16px;
+font-size:14px;
+opacity:.9;
 }
+#hospitalBox,#infoBox{display:none;}
 </style>
 </head>
 
@@ -109,16 +101,24 @@ display:none;
 
 <!-- LOGIN -->
 <div id="loginBox">
-
 <h1>Dr_Duty</h1>
 <div class="sub">Medical On-Call Portal</div>
 
-<input type="password" id="pass" placeholder="••••••">
+<input type="password" id="pass" placeholder="Password">
 
-<button class="loginBtn" onclick="login()">دخول</button>
+<button class="loginBtn" onclick="login()">Login</button>
 
 <div class="small">Authorized Doctors Only</div>
+</div>
 
+<!-- HOSPITAL SELECT -->
+<div id="hospitalBox">
+<h1>Select</h1>
+<div class="sub">Choose Hospital</div>
+
+<select id="hospitalSelect"></select>
+
+<button class="loginBtn" onclick="loadDuty()">Continue</button>
 </div>
 
 <!-- INFO -->
@@ -172,13 +172,35 @@ return;
 }
 
 loginBox.style.display="none";
-infoBox.style.display="block";
+hospitalBox.style.display="block";
 
-loadDuty();
+loadHospitals();
+
+}
+
+function loadHospitals(){
+
+hospitalSelect.innerHTML="";
+
+db.collection("Hospitals").get().then(snap=>{
+
+snap.forEach(doc=>{
+
+hospitalSelect.innerHTML +=
+'<option value="'+doc.id+'">'+doc.id+'</option>';
+
+});
+
+});
 
 }
 
 function loadDuty(){
+
+hospitalBox.style.display="none";
+infoBox.style.display="block";
+
+let hospital = hospitalSelect.value;
 
 specName.innerText = spec;
 
@@ -190,7 +212,7 @@ let d = doc.data();
 
 doctorName.innerText = d.name || "Doctor";
 phoneText.innerText = d.phone || "---";
-hospitalText.innerText = d.hospital || "---";
+hospitalText.innerText = hospital;
 
 callBtn.href = "tel:" + (d.phone || "");
 
@@ -214,7 +236,7 @@ now.getFullYear();
 
 doctorName.innerText="No Data";
 phoneText.innerText="---";
-hospitalText.innerText="---";
+hospitalText.innerText=hospital;
 
 }
 
