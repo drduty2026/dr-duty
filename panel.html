@@ -51,6 +51,17 @@ font-weight:bold;
 
 <h1>Dr Duty Admin Panel</h1>
 
+<!-- Doctor Directory -->
+<div class="card">
+<h2>Doctor Directory</h2>
+
+<input id="dirName" placeholder="Doctor Name">
+<input id="dirPhone" placeholder="Phone Number">
+
+<button class="green" onclick="saveDoctorDirectory()">Save Doctor</button>
+</div>
+
+<!-- Hospital -->
 <div class="card">
 <h2>Add Hospital</h2>
 
@@ -59,10 +70,15 @@ font-weight:bold;
 <button onclick="saveHospital()">Save Hospital</button>
 </div>
 
+<!-- Duty -->
 <div class="card">
 <h2>Update Duty</h2>
 
 <select id="spec"></select>
+
+<select id="doctorSelect" onchange="fillDoctor()">
+<option value="">Select Saved Doctor</option>
+</select>
 
 <input id="doctorName" placeholder="Doctor Name">
 
@@ -73,11 +89,11 @@ font-weight:bold;
 <button onclick="saveDuty()">Save Duty</button>
 </div>
 
+<!-- Assistants -->
 <div class="card">
 <h2>Add Assistant</h2>
 
 <input id="auser" placeholder="Username">
-
 <input id="apass" placeholder="Password">
 
 <button class="green" onclick="saveAssistant()">Save Assistant</button>
@@ -108,40 +124,17 @@ appId: "1:1051471488231:web:d9abfafee31373ec826e42"
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-/* 33 SPECIALTIES */
+/* SPECIALTIES */
 const arr = [
-"Emergency Medicine",
-"Surgery",
-"Internal Medicine",
-"Pediatrics",
-"Orthopedics",
-"ENT",
-"Ophthalmology",
-"Urology",
-"Cardiology",
-"Neurosurgery",
-"Radiology",
-"Dermatology",
-"Gynecology",
-"Anesthesia",
-"Psychiatry",
-"Oncology",
-"Nephrology",
-"Maxillofacial",
-"Pediatric Surgery",
-"Plastic Surgery",
-"Cardiovascular Surgery",
-"ICU",
-"CCU",
-"Medicine F Ward",
-"Medicine M Ward",
-"Surgery F Ward",
-"Surgery M Ward",
-"Dialysis Ward",
-"Oncology Ward",
-"Referral Doctor",
-"Emergency Ward Rotating Resident",
-"Evening Consultant",
+"Emergency Medicine","Surgery","Internal Medicine","Pediatrics",
+"Orthopedics","ENT","Ophthalmology","Urology","Cardiology",
+"Neurosurgery","Radiology","Dermatology","Gynecology",
+"Anesthesia","Psychiatry","Oncology","Nephrology",
+"Maxillofacial","Pediatric Surgery","Plastic Surgery",
+"Cardiovascular Surgery","ICU","CCU","Medicine F Ward",
+"Medicine M Ward","Surgery F Ward","Surgery M Ward",
+"Dialysis Ward","Oncology Ward","Referral Doctor",
+"Emergency Ward Rotating Resident","Evening Consultant",
 "Emergency Ward Intern Doctor"
 ];
 
@@ -149,80 +142,54 @@ for(let i=0;i<arr.length;i++){
 spec.innerHTML += "<option>"+arr[i]+"</option>";
 }
 
-/* LOAD HOSPITALS */
+/* HOSPITALS */
 function loadHospitals(){
-
 hospitalList.innerHTML="";
-
 db.collection("Hospitals").get().then(snap=>{
-
 snap.forEach(doc=>{
 hospitalList.innerHTML += "<option>"+doc.id+"</option>";
 });
-
 });
-
 }
 
-loadHospitals();
-
-/* SAVE HOSPITAL */
 function saveHospital(){
-
 let h=hospitalName.value.trim();
-
 if(h==="") return;
 
 db.collection("Hospitals").doc(h).set({
 name:h
 }).then(()=>{
-
 hospitalName.value="";
 loadHospitals();
 alert("Hospital Saved");
-
 });
-
 }
 
-/* SAVE DUTY */
-function saveDuty(){
+/* DOCTOR DIRECTORY */
+function loadDoctors(){
+doctorSelect.innerHTML='<option value="">Select Saved Doctor</option>';
 
-db.collection("Duties").doc(spec.value).set({
-spec:spec.value,
-name:doctorName.value,
-phone:doctorPhone.value,
-hospital:hospitalList.value
+db.collection("Doctors").get().then(snap=>{
+snap.forEach(doc=>{
+doctorSelect.innerHTML += '<option value="'+doc.id+'">'+doc.id+'</option>';
+});
+});
+}
+
+function saveDoctorDirectory(){
+
+let n=dirName.value.trim();
+let p=dirPhone.value.trim();
+
+if(n==="") return;
+
+db.collection("Doctors").doc(n).set({
+name:n,
+phone:p
 }).then(()=>{
-
-alert("Duty Saved");
-
+dirName.value="";
+dirPhone.value="";
+loadDoctors();
+alert("Doctor Saved");
 });
-
 }
-
-/* SAVE ASSISTANT */
-function saveAssistant(){
-
-db.collection("Assistants").doc(auser.value).set({
-username:auser.value,
-password:apass.value,
-active:true
-}).then(()=>{
-
-alert("Assistant Saved");
-
-});
-
-}
-
-/* LOGOUT */
-function logout(){
-localStorage.removeItem("role");
-location.href="admin.html";
-}
-
-</script>
-
-</body>
-</html>
