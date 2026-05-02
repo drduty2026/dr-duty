@@ -52,6 +52,15 @@ font-weight:bold;
 <h1>Dr Duty Admin Panel</h1>
 
 <div class="card">
+<h2>Doctor Directory</h2>
+
+<input id="saveDoctorName" placeholder="Doctor Name">
+<input id="saveDoctorPhone" placeholder="Phone Number">
+
+<button class="green" onclick="saveDoctor()">Save Doctor</button>
+</div>
+
+<div class="card">
 <h2>Add Hospital</h2>
 
 <input id="hospitalName" placeholder="Hospital Name">
@@ -64,7 +73,10 @@ font-weight:bold;
 
 <select id="spec"></select>
 
-<input id="doctorName" placeholder="Doctor Name">
+<input id="doctorName" placeholder="Doctor Name"
+list="doctorSuggestions" oninput="searchDoctor()">
+
+<datalist id="doctorSuggestions"></datalist>
 
 <input id="doctorPhone" placeholder="Phone Number">
 
@@ -77,7 +89,6 @@ font-weight:bold;
 <h2>Add Assistant</h2>
 
 <input id="auser" placeholder="Username">
-
 <input id="apass" placeholder="Password">
 
 <button class="green" onclick="saveAssistant()">Save Assistant</button>
@@ -118,45 +129,77 @@ appId: "1:1051471488231:web:d9abfafee31373ec826e42"
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-/* 33 SPECIALTIES */
+/* SPECIALTIES */
 const arr = [
-"Emergency Medicine",
-"Surgery",
-"Internal Medicine",
-"Pediatrics",
-"Orthopedics",
-"ENT",
-"Ophthalmology",
-"Urology",
-"Cardiology",
-"Neurosurgery",
-"Radiology",
-"Dermatology",
-"Gynecology",
-"Anesthesia",
-"Psychiatry",
-"Oncology",
-"Nephrology",
-"Maxillofacial",
-"Pediatric Surgery",
-"Plastic Surgery",
-"Cardiovascular Surgery",
-"ICU",
-"CCU",
-"Medicine F Ward",
-"Medicine M Ward",
-"Surgery F Ward",
-"Surgery M Ward",
-"Dialysis Ward",
-"Oncology Ward",
-"Referral Doctor",
-"Emergency Ward Rotating Resident",
-"Evening Consultant",
+"Emergency Medicine","Surgery","Internal Medicine","Pediatrics",
+"Orthopedics","ENT","Ophthalmology","Urology","Cardiology",
+"Neurosurgery","Radiology","Dermatology","Gynecology",
+"Anesthesia","Psychiatry","Oncology","Nephrology",
+"Maxillofacial","Pediatric Surgery","Plastic Surgery",
+"Cardiovascular Surgery","ICU","CCU","Medicine F Ward",
+"Medicine M Ward","Surgery F Ward","Surgery M Ward",
+"Dialysis Ward","Oncology Ward","Referral Doctor",
+"Emergency Ward Rotating Resident","Evening Consultant",
 "Emergency Ward Intern Doctor"
 ];
 
 for(let i=0;i<arr.length;i++){
-document.getElementById("spec").innerHTML += "<option>"+arr[i]+"</option>";
+document.getElementById("spec").innerHTML +=
+"<option>"+arr[i]+"</option>";
+}
+
+/* SAVE DOCTOR */
+function saveDoctor(){
+
+let n=document.getElementById("saveDoctorName").value.trim();
+let p=document.getElementById("saveDoctorPhone").value.trim();
+
+if(n==="") return;
+
+db.collection("Doctors").doc(n).set({
+name:n,
+phone:p
+}).then(()=>{
+
+document.getElementById("saveDoctorName").value="";
+document.getElementById("saveDoctorPhone").value="";
+
+alert("Doctor Saved");
+
+});
+
+}
+
+/* SEARCH DOCTOR */
+function searchDoctor(){
+
+let q=document.getElementById("doctorName").value.trim();
+
+db.collection("Doctors").get().then(snap=>{
+
+document.getElementById("doctorSuggestions").innerHTML="";
+
+snap.forEach(doc=>{
+
+let d=doc.data();
+
+if(d.name.toLowerCase().startsWith(q.toLowerCase())){
+
+document.getElementById("doctorSuggestions").innerHTML +=
+'<option value="'+d.name+'">';
+
+}
+
+if(d.name.toLowerCase()===q.toLowerCase()){
+
+document.getElementById("doctorPhone").value=d.phone;
+
+}
+
+});
+
+});
+
 }
 
 /* LOAD HOSPITALS */
@@ -167,7 +210,8 @@ document.getElementById("hospitalList").innerHTML="";
 db.collection("Hospitals").get().then(snap=>{
 
 snap.forEach(doc=>{
-document.getElementById("hospitalList").innerHTML += "<option>"+doc.id+"</option>";
+document.getElementById("hospitalList").innerHTML +=
+"<option>"+doc.id+"</option>";
 });
 
 });
@@ -187,6 +231,7 @@ name:h
 
 document.getElementById("hospitalName").value="";
 loadHospitals();
+
 alert("Hospital Saved");
 
 });
@@ -196,11 +241,15 @@ alert("Hospital Saved");
 /* SAVE DUTY */
 function saveDuty(){
 
-db.collection("Duties").doc(document.getElementById("spec").value).set({
+db.collection("Duties").doc(
+document.getElementById("spec").value
+).set({
+
 spec:document.getElementById("spec").value,
 name:document.getElementById("doctorName").value,
 phone:document.getElementById("doctorPhone").value,
 hospital:document.getElementById("hospitalList").value
+
 }).then(()=>{
 
 alert("Duty Saved");
@@ -212,10 +261,14 @@ alert("Duty Saved");
 /* SAVE ASSISTANT */
 function saveAssistant(){
 
-db.collection("Assistants").doc(document.getElementById("auser").value).set({
+db.collection("Assistants").doc(
+document.getElementById("auser").value
+).set({
+
 username:document.getElementById("auser").value,
 password:document.getElementById("apass").value,
 active:true
+
 }).then(()=>{
 
 alert("Assistant Saved");
@@ -236,8 +289,10 @@ document.getElementById("assistantCount").innerHTML =
 "Assistants: " + snap.size;
 
 snap.forEach(doc=>{
+
 document.getElementById("assistantList").innerHTML +=
 "<option>"+doc.id+"</option>";
+
 });
 
 });
