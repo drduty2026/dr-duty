@@ -1,14 +1,31 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>panel.html</title>
+<title>Admin Panel</title>
 
 <style>
-body{margin:0;font-family:Arial;background:#081a35;color:#fff;padding:20px}
-.box{max-width:900px;margin:auto;background:#10284f;padding:20px;border-radius:20px}
-.card{background:#173764;padding:18px;border-radius:18px;margin-top:15px}
+body{
+margin:0;
+font-family:Arial,sans-serif;
+background:#081a35;
+color:#fff;
+padding:20px;
+}
+.box{
+max-width:900px;
+margin:auto;
+background:#10284f;
+padding:20px;
+border-radius:20px;
+}
+.card{
+background:#173764;
+padding:18px;
+border-radius:18px;
+margin-top:15px;
+}
 input,select,button{
 width:100%;
 padding:14px;
@@ -18,31 +35,36 @@ border-radius:10px;
 font-size:17px;
 box-sizing:border-box;
 }
-button{background:#2563eb;color:#fff;font-weight:bold}
-.red{background:#dc2626}
-.green{background:#16a34a}
-.gray{background:#475569}
-.orange{background:#ea580c}
+button{
+background:#2563eb;
+color:#fff;
+font-weight:bold;
+cursor:pointer;
+}
+.red{background:#dc2626;}
+.green{background:#16a34a;}
+.orange{background:#ea580c;}
 </style>
 </head>
 
 <body>
 
 <script>
-if(localStorage.getItem("loggedIn")!="yes" || localStorage.getItem("role")!="admin"){
+if(localStorage.getItem("session")!=="admin"){
 location.href="admin.html";
 }
 </script>
 
 <div class="box">
 
-<h1>Admin Panel</h1>
+<h1>Dr Duty Admin Panel</h1>
 
 <div class="card">
 <h2>Hospitals</h2>
 
 <input id="hospitalInput" placeholder="Hospital Name">
-<button onclick="addHospital()">Save Hospital</button>
+
+<button onclick="addHospital()">Add Hospital</button>
 
 <select id="hospitalList"></select>
 
@@ -50,36 +72,31 @@ location.href="admin.html";
 </div>
 
 <div class="card">
-<h2>Doctors</h2>
+<h2>Doctors Duty</h2>
 
-<input id="docName" placeholder="Doctor Name">
-<input id="docPhone" placeholder="Phone Number">
+<select id="specList"></select>
 
-<select id="docHospital"></select>
+<input id="doctorName" placeholder="Doctor Name">
 
-<button onclick="saveDoctor()">Save Doctor</button>
+<input id="doctorPhone" placeholder="Phone Number">
 
-<select id="doctorList" onchange="loadDoctor()"></select>
+<select id="doctorHospital"></select>
 
-<button class="red" onclick="deleteDoctor()">Delete Doctor</button>
+<button onclick="saveDuty()">Save Duty</button>
 </div>
 
 <div class="card">
 <h2>Assistants</h2>
 
-<select id="assistantDoctor"></select>
+<input id="aUser" placeholder="Assistant Name">
 
-<input id="assistantPass" placeholder="Password">
+<input id="aPass" placeholder="Password">
 
-<button class="green" onclick="makeAssistant()">Make Assistant</button>
+<button class="green" onclick="addAssistant()">Add Assistant</button>
 
 <select id="assistantList"></select>
 
-<input id="newPass" placeholder="New Password">
-
-<button class="orange" onclick="changePass()">Change Password</button>
-
-<button class="gray" onclick="toggleAssistant()">Disable / Enable</button>
+<button class="orange" onclick="toggleAssistant()">Disable / Enable</button>
 
 <button class="red" onclick="deleteAssistant()">Delete Assistant</button>
 </div>
@@ -90,154 +107,136 @@ location.href="admin.html";
 
 <script>
 
+/* DATA HELPERS */
 function getData(k){
 return JSON.parse(localStorage.getItem(k)||"[]");
 }
-
 function setData(k,v){
 localStorage.setItem(k,JSON.stringify(v));
 }
 
-/* Hospitals */
+/* 33 SPECIALTIES */
+const specs=[
+"Emergency Medicine",
+"Surgery",
+"Internal Medicine",
+"Pediatrics",
+"Orthopedics",
+"ENT",
+"Ophthalmology",
+"Urology",
+"Cardiology",
+"Neurosurgery",
+"Radiology",
+"Dermatology",
+"Gynecology",
+"Anesthesia",
+"Psychiatry",
+"Oncology",
+"Nephrology",
+"Maxillofacial",
+"Pediatric Surgery",
+"Plastic Surgery",
+"Cardiovascular Surgery",
+"ICU",
+"CCU",
+"Medicine F Ward",
+"Medicine M Ward",
+"Surgery F Ward",
+"Surgery M Ward",
+"Dialysis Ward",
+"Oncology Ward",
+"Referral Doctor",
+"Emergency Ward Rotating Resident",
+"Evening Consultant",
+"Emergency Ward Intern Doctor"
+];
 
+specs.forEach(x=>{
+specList.innerHTML += <option>${x}</option>;
+});
+
+/* HOSPITALS */
 function loadHospitals(){
 let arr=getData("hospitals");
 
 hospitalList.innerHTML="";
-docHospital.innerHTML="";
+doctorHospital.innerHTML="";
 
 arr.forEach(x=>{
-hospitalList.innerHTML+=<option>${x}</option>;
-docHospital.innerHTML+=<option>${x}</option>;
+hospitalList.innerHTML += <option>${x}</option>;
+doctorHospital.innerHTML += <option>${x}</option>;
 });
 }
 
 function addHospital(){
 let v=hospitalInput.value.trim();
-if(v=="") return;
+if(v==="") return;
 
 let arr=getData("hospitals");
 arr.push(v);
-
 setData("hospitals",arr);
 
 hospitalInput.value="";
 loadHospitals();
+alert("Hospital Added");
 }
 
 function deleteHospital(){
-let arr=getData("hospitals").filter(x=>x!=hospitalList.value);
+let arr=getData("hospitals").filter(x=>x!==hospitalList.value);
 setData("hospitals",arr);
 loadHospitals();
+alert("Deleted");
 }
 
-/* Doctors */
+/* DUTIES */
+function saveDuty(){
 
-function loadDoctors(){
+let arr=getData("duties");
 
-let arr=getData("doctors");
+arr=arr.filter(x=>x.spec!==specList.value);
 
-doctorList.innerHTML="";
-assistantDoctor.innerHTML="";
-
-arr.forEach(x=>{
-doctorList.innerHTML+=<option>${x.name}</option>;
-assistantDoctor.innerHTML+=<option>${x.name}</option>;
+arr.push({
+spec:specList.value,
+name:doctorName.value,
+phone:doctorPhone.value,
+hospital:doctorHospital.value
 });
+
+setData("duties",arr);
+
+alert("Saved Successfully");
 }
 
-function saveDoctor(){
-
-let arr=getData("doctors");
-
-let obj={
-name:docName.value,
-phone:docPhone.value,
-hospital:docHospital.value
-};
-
-arr=arr.filter(x=>x.name!=obj.name);
-arr.push(obj);
-
-setData("doctors",arr);
-
-loadDoctors();
-
-alert("Saved");
-}
-
-function loadDoctor(){
-
-let arr=getData("doctors");
-
-let d=arr.find(x=>x.name==doctorList.value);
-
-if(!d) return;
-
-docName.value=d.name;
-docPhone.value=d.phone;
-docHospital.value=d.hospital;
-}
-
-function deleteDoctor(){
-
-let arr=getData("doctors").filter(x=>x.name!=doctorList.value);
-
-setData("doctors",arr);
-
-loadDoctors();
-}
-
-/* Assistants */
-
+/* ASSISTANTS */
 function loadAssistants(){
-
 let arr=getData("assistants");
 
 assistantList.innerHTML="";
 
 arr.forEach(x=>{
-assistantList.innerHTML+=<option>${x.user}</option>;
+assistantList.innerHTML += <option>${x.user}</option>;
 });
 }
 
-function makeAssistant(){
+function addAssistant(){
 
 let arr=getData("assistants");
 
-let user=assistantDoctor.value;
-let pass=assistantPass.value;
-
-arr=arr.filter(x=>x.user!=user);
-
 arr.push({
-user:user,
-pass:pass,
+user:aUser.value,
+pass:aPass.value,
 active:true
 });
 
 setData("assistants",arr);
 
-assistantPass.value="";
+aUser.value="";
+aPass.value="";
 
 loadAssistants();
 
-alert("Assistant Created");
-}
-
-function changePass(){
-
-let arr=getData("assistants");
-
-arr.forEach(x=>{
-if(x.user==assistantList.value){
-x.pass=newPass.value;
-}
-});
-
-setData("assistants",arr);
-
-alert("Password Changed");
+alert("Assistant Added");
 }
 
 function toggleAssistant(){
@@ -245,7 +244,7 @@ function toggleAssistant(){
 let arr=getData("assistants");
 
 arr.forEach(x=>{
-if(x.user==assistantList.value){
+if(x.user===assistantList.value){
 x.active=!x.active;
 }
 });
@@ -257,7 +256,7 @@ alert("Updated");
 
 function deleteAssistant(){
 
-let arr=getData("assistants").filter(x=>x.user!=assistantList.value);
+let arr=getData("assistants").filter(x=>x.user!==assistantList.value);
 
 setData("assistants",arr);
 
@@ -266,20 +265,14 @@ loadAssistants();
 alert("Deleted");
 }
 
-/* Logout */
-
+/* LOGOUT */
 function logout(){
-
-localStorage.removeItem("loggedIn");
-localStorage.removeItem("role");
-
+localStorage.removeItem("session");
 location.href="admin.html";
 }
 
-/* Start */
-
+/* START */
 loadHospitals();
-loadDoctors();
 loadAssistants();
 
 </script>
