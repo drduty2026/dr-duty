@@ -83,6 +83,16 @@ font-weight:bold;
 <button class="green" onclick="saveAssistant()">Save Assistant</button>
 </div>
 
+<div class="card">
+<h2>Assistants Manager</h2>
+
+<p id="assistantCount">Assistants: 0</p>
+
+<select id="assistantList"></select>
+
+<button class="red" onclick="deleteAssistant()">Delete Assistant</button>
+</div>
+
 <button class="red" onclick="logout()">Logout</button>
 
 </div>
@@ -164,8 +174,6 @@ document.getElementById("hospitalList").innerHTML += "<option>"+doc.id+"</option
 
 }
 
-loadHospitals();
-
 /* SAVE HOSPITAL */
 function saveHospital(){
 
@@ -211,6 +219,42 @@ active:true
 }).then(()=>{
 
 alert("Assistant Saved");
+loadAssistants();
+
+});
+
+}
+
+/* LOAD ASSISTANTS */
+function loadAssistants(){
+
+document.getElementById("assistantList").innerHTML="";
+
+db.collection("Assistants").get().then(snap=>{
+
+document.getElementById("assistantCount").innerHTML =
+"Assistants: " + snap.size;
+
+snap.forEach(doc=>{
+document.getElementById("assistantList").innerHTML +=
+"<option>"+doc.id+"</option>";
+});
+
+});
+
+}
+
+/* DELETE ASSISTANT */
+function deleteAssistant(){
+
+let u=document.getElementById("assistantList").value;
+
+if(!u) return;
+
+db.collection("Assistants").doc(u).delete().then(()=>{
+
+alert("Assistant Deleted");
+loadAssistants();
 
 });
 
@@ -221,6 +265,10 @@ function logout(){
 localStorage.removeItem("role");
 location.href="admin.html";
 }
+
+/* START */
+loadHospitals();
+loadAssistants();
 
 </script>
 
