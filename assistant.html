@@ -48,27 +48,21 @@ background:#dc2626;
 
 <body>
 
-<script>
-if(localStorage.getItem("session")!=="assistant"){
-location.href="admin.html";
-}
-</script>
-
 <div class="box">
 
 <h1>Assistant Panel</h1>
 
 <div class="card">
 
-<h2>Edit Duty</h2>
+<h2>Update Duty</h2>
 
-<select id="specList"></select>
+<select id="spec"></select>
 
 <input id="doctorName" placeholder="Doctor Name">
 
 <input id="doctorPhone" placeholder="Phone Number">
 
-<button onclick="saveDuty()">Save Changes</button>
+<button onclick="saveDuty()">Save Duty</button>
 
 </div>
 
@@ -76,17 +70,28 @@ location.href="admin.html";
 
 </div>
 
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
 <script>
 
-function getData(k){
-return JSON.parse(localStorage.getItem(k)||"[]");
+if(localStorage.getItem("role")!=="assistant"){
+location.href="admin.html";
 }
 
-function setData(k,v){
-localStorage.setItem(k,JSON.stringify(v));
-}
+const firebaseConfig = {
+apiKey: "AIzaSyDQqQpACfdiq-i1q-hv9auGjEkSeHhMIuc",
+authDomain: "dr-duty.firebaseapp.com",
+projectId: "dr-duty",
+storageBucket: "dr-duty.firebasestorage.app",
+messagingSenderId: "1051471488231",
+appId: "1:1051471488231:web:d9abfafee31373ec826e42"
+};
 
-const specs=[
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+const arr = [
 "Emergency Medicine","Surgery","Internal Medicine","Pediatrics",
 "Orthopedics","ENT","Ophthalmology","Urology","Cardiology",
 "Neurosurgery","Radiology","Dermatology","Gynecology",
@@ -99,29 +104,24 @@ const specs=[
 "Emergency Ward Intern Doctor"
 ];
 
-specs.forEach(x=>{
-specList.innerHTML+=<option>${x}</option>;
-});
+for(let i=0;i<arr.length;i++){
+spec.innerHTML += "<option>"+arr[i]+"</option>";
+}
 
 function saveDuty(){
 
-let arr=getData("duties");
-
-arr=arr.filter(x=>x.spec!==specList.value);
-
-arr.push({
-spec:specList.value,
+db.collection("Duties").doc(spec.value).set({
+spec:spec.value,
 name:doctorName.value,
 phone:doctorPhone.value
+}).then(()=>{
+alert("Saved");
 });
 
-setData("duties",arr);
-
-alert("Saved");
 }
 
 function logout(){
-localStorage.removeItem("session");
+localStorage.removeItem("role");
 location.href="admin.html";
 }
 
