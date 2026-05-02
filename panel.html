@@ -82,7 +82,6 @@ cursor:pointer;
 </select>
 
 <input id="doctorName" placeholder="Doctor Name (or type manually)">
-
 <input id="doctorPhone" placeholder="Phone Number">
 
 <select id="hospitalList"></select>
@@ -100,7 +99,7 @@ cursor:pointer;
 <button class="green" onclick="saveAssistant()">Save Assistant</button>
 </div>
 
-<!-- Assistant Manager -->
+<!-- Assistants -->
 <div class="card">
 <h2>Assistants Manager</h2>
 
@@ -109,6 +108,18 @@ cursor:pointer;
 <select id="assistantList"></select>
 
 <button class="red" onclick="deleteAssistant()">Delete Assistant</button>
+</div>
+
+<!-- ADMIN SECURITY -->
+<div class="card" id="adminSecurity">
+<h2>Admin Security</h2>
+
+<input id="newAdminUser" placeholder="New Username">
+<input id="newAdminPass" placeholder="New Password">
+
+<button class="green" onclick="changeAdminLogin()">
+Save Changes
+</button>
 </div>
 
 <button class="red" onclick="logout()">Logout</button>
@@ -195,7 +206,7 @@ savedDoctors.innerHTML +=
 
 }
 
-/* SELECT DOCTOR */
+/* FILL DOCTOR */
 function fillDoctor(){
 
 let n=savedDoctors.value;
@@ -206,10 +217,8 @@ db.collection("Doctors").doc(n).get().then(doc=>{
 
 if(doc.exists){
 
-let d=doc.data();
-
-doctorName.value=d.name;
-doctorPhone.value=d.phone;
+doctorName.value=doc.data().name;
+doctorPhone.value=doc.data().phone;
 
 }
 
@@ -318,6 +327,31 @@ loadAssistants();
 
 }
 
+/* ADMIN LOGIN CHANGE */
+function changeAdminLogin(){
+
+let u=newAdminUser.value.trim();
+let p=newAdminPass.value.trim();
+
+if(u==="" || p===""){
+alert("Enter Username + Password");
+return;
+}
+
+db.collection("Admins").doc("main").set({
+username:u,
+password:p
+}).then(()=>{
+
+alert("Admin Updated");
+
+newAdminUser.value="";
+newAdminPass.value="";
+
+});
+
+}
+
 /* LOGOUT */
 function logout(){
 localStorage.removeItem("role");
@@ -328,6 +362,19 @@ location.href="admin.html";
 loadDoctors();
 loadHospitals();
 loadAssistants();
+
+db.collection("Admins").doc("main").get().then(doc=>{
+
+if(!doc.exists){
+
+db.collection("Admins").doc("main").set({
+username:"admin",
+password:"1234"
+});
+
+}
+
+});
 
 </script>
 
