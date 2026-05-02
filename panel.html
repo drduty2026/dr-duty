@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Admin Panel</title>
+<title>Dr Duty Admin Panel</title>
 
 <style>
 body{
 margin:0;
 font-family:Arial,sans-serif;
 background:#081a35;
-color:white;
+color:#fff;
 padding:20px;
 }
 .box{
@@ -37,12 +37,19 @@ box-sizing:border-box;
 }
 button{
 background:#2563eb;
-color:white;
+color:#fff;
 font-weight:bold;
 cursor:pointer;
 }
 .red{background:#dc2626;}
 .green{background:#16a34a;}
+.msg{
+padding:10px;
+margin:10px 0;
+border-radius:10px;
+background:#0f5132;
+display:none;
+}
 </style>
 </head>
 
@@ -52,9 +59,12 @@ cursor:pointer;
 
 <h1>Dr Duty Admin Panel</h1>
 
-<div class="card">
+<div id="msg" class="msg"></div>
 
+<div class="card">
 <h2>Update Duty</h2>
+
+<select id="hospital"></select>
 
 <select id="spec"></select>
 
@@ -62,36 +72,43 @@ cursor:pointer;
 
 <input id="phone" placeholder="Phone Number">
 
-<button onclick="saveDuty()">Save Duty</button>
-
+<button id="saveBtn">Save Duty</button>
 </div>
 
 <div class="card">
+<h2>Add Hospital</h2>
 
+<input id="newHospital" placeholder="Hospital Name">
+
+<button id="hospitalBtn" class="green">Save Hospital</button>
+</div>
+
+<div class="card">
 <h2>Add Assistant</h2>
 
 <input id="auser" placeholder="Username">
 
 <input id="apass" placeholder="Password">
 
-<button class="green" onclick="addAssistant()">Save Assistant</button>
-
+<button id="assistantBtn" class="green">Save Assistant</button>
 </div>
 
-<button class="red" onclick="logout()">Logout</button>
+<button id="logoutBtn" class="red">Logout</button>
 
 </div>
 
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-
 import {
 getFirestore,
 doc,
-setDoc
+setDoc,
+getDocs,
+collection
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
+/* حماية الصفحة */
 if(localStorage.getItem("role")!=="admin"){
 location.href="admin.html";
 }
@@ -108,67 +125,86 @@ appId: "1:1051471488231:web:d9abfafee31373ec826e42"
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
+const msg = document.getElementById("msg");
+
+function showMsg(t){
+msg.style.display="block";
+msg.innerText=t;
+setTimeout(()=>msg.style.display="none",2500);
+}
+
 const specs = [
-"Emergency Medicine",
-"Surgery",
-"Internal Medicine",
-"Pediatrics",
-"Orthopedics",
-"ENT",
-"Ophthalmology",
-"Urology",
-"Cardiology",
-"Neurosurgery",
-"Radiology",
-"Dermatology",
-"Gynecology",
-"Anesthesia",
-"Psychiatry",
-"Oncology",
-"Nephrology",
-"Maxillofacial",
-"Pediatric Surgery",
-"Plastic Surgery",
-"Cardiovascular Surgery",
-"ICU",
-"CCU",
-"Medicine F Ward",
-"Medicine M Ward",
-"Surgery F Ward",
-"Surgery M Ward",
-"Dialysis Ward",
-"Oncology Ward",
-"Referral Doctor",
-"Emergency Ward Rotating Resident",
-"Evening Consultant",
+"Emergency Medicine","Surgery","Internal Medicine","Pediatrics",
+"Orthopedics","ENT","Ophthalmology","Urology","Cardiology",
+"Neurosurgery","Radiology","Dermatology","Gynecology",
+"Anesthesia","Psychiatry","Oncology","Nephrology",
+"Maxillofacial","Pediatric Surgery","Plastic Surgery",
+"Cardiovascular Surgery","ICU","CCU","Medicine F Ward",
+"Medicine M Ward","Surgery F Ward","Surgery M Ward",
+"Dialysis Ward","Oncology Ward","Referral Doctor",
+"Emergency Ward Rotating Resident","Evening Consultant",
 "Emergency Ward Intern Doctor"
 ];
 
+const spec = document.getElementById("spec");
 specs.forEach(x=>{
-document.getElementById("spec").innerHTML += <option>${x}</option>;
+spec.innerHTML += <option value="${x}">${x}</option>;
 });
 
-window.saveDuty = async function(){
+/* تحميل المستشفيات */
+async function loadHospitals(){
+const hospital = document.getElementById("hospital");
+hospital.innerHTML="";
 
-let s=spec.value;
-let n=name.value;
-let p=phone.value;
+const snap = await getDocs(collection(db,"Hospitals"));
 
-await setDoc(doc(db,"Duties",s),{
-name:n,
-phone:p,
-spec:s,
+if(snap.empty){
+hospital.innerHTML=<option>No Hospitals</option>;
+return;
+}
+
+snap.forEach(d=>{
+hospital.innerHTML += <option value="${d.id}">${d.id}</option>;
+});
+}
+
+/* حفظ الطبيب */
+document.getElementById("saveBtn").onclick = async ()=>{
+
+await setDoc(doc(db,"Duties",spec.value),{
+spec:spec.value,
+hospital:document.getElementById("hospital").value,
+name:document.getElementById("name").value,
+phone:document.getElementById("phone").value,
 updated:new Date().toLocaleDateString()
 });
 
-alert("Saved Successfully");
+showMsg("Duty Saved");
+};
 
-}
+/* حفظ مستشفى */
+document.getElementById("hospitalBtn").onclick = async ()=>{
 
-window.addAssistant = async function(){
+let h = document.getElementById("newHospital").value.trim();
+if(!h) return;
 
-let u=auser.value.trim();
-let p=apass.value.trim();
+await setDoc(doc(db,"Hospitals",h),{
+name:h
+});
+
+document.getElementById("newHospital").value="";
+await loadHospitals();
+
+showMsg("Hospital Saved");
+};
+
+/* حفظ مساعد */
+document.getElementById("assistantBtn").onclick = async ()=>{
+
+let u=document.getElementById("auser").value.trim();
+let p=document.getElementById("apass").value.trim();
+
+if(!u || !p) return;
 
 await setDoc(doc(db,"Assistants",u),{
 username:u,
@@ -176,14 +212,17 @@ password:p,
 active:true
 });
 
-alert("Assistant Saved");
+showMsg("Assistant Saved");
+};
 
-}
-
-window.logout=function(){
+/* خروج */
+document.getElementById("logoutBtn").onclick = ()=>{
 localStorage.removeItem("role");
 location.href="admin.html";
-}
+};
+
+/* تشغيل */
+loadHospitals();
 
 </script>
 
