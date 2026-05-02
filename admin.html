@@ -9,17 +9,17 @@
 body{
 margin:0;
 font-family:Arial,sans-serif;
-background:#081a44;
+background:#081a35;
 display:flex;
 justify-content:center;
 align-items:center;
 height:100vh;
-color:#fff;
+color:white;
 }
 .box{
 width:90%;
 max-width:420px;
-background:#102b63;
+background:#10284f;
 padding:30px;
 border-radius:20px;
 box-shadow:0 0 20px rgba(0,0,0,.3);
@@ -43,8 +43,8 @@ padding:14px;
 margin-top:10px;
 border:none;
 border-radius:10px;
-background:#1f6bff;
-color:#fff;
+background:#2563eb;
+color:white;
 font-size:18px;
 font-weight:bold;
 cursor:pointer;
@@ -65,47 +65,61 @@ cursor:pointer;
 
 </div>
 
-<script>
-/* Auto Redirect */
-if(localStorage.getItem("session")=="admin"){
-location.href="panel.html";
-}
-if(localStorage.getItem("session")=="assistant"){
-location.href="assistant.html";
-}
+<script type="module">
 
-/* Login */
-function login(){
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+getFirestore,
+doc,
+getDoc
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+apiKey: "AIzaSyDQqQpACfdiq-i1q-hv9auGjEkSeHhMIuc",
+authDomain: "dr-duty.firebaseapp.com",
+projectId: "dr-duty",
+storageBucket: "dr-duty.firebasestorage.app",
+messagingSenderId: "1051471488231",
+appId: "1:1051471488231:web:d9abfafee31373ec826e42"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+window.login = async function(){
 
 let u=document.getElementById("user").value.trim();
 let p=document.getElementById("pass").value.trim();
 
-/* Main Admin */
+/* MAIN ADMIN */
 if(u==="admin" && p==="1234"){
-localStorage.setItem("session","admin");
+localStorage.setItem("role","admin");
 location.href="panel.html";
 return;
 }
 
-/* Assistant Accounts */
-let arr=JSON.parse(localStorage.getItem("assistants")||"[]");
+/* Assistants */
+const ref = doc(db,"Assistants",u);
+const snap = await getDoc(ref);
 
-let found=arr.find(x =>
-x.user===u &&
-x.pass===p &&
-x.active===true
-);
+if(snap.exists()){
 
-if(found){
-localStorage.setItem("session","assistant");
-localStorage.setItem("assistantName",u);
+let data=snap.data();
+
+if(data.password===p && data.active===true){
+
+localStorage.setItem("role","assistant");
+localStorage.setItem("assistant",u);
+
 location.href="assistant.html";
 return;
 }
+}
 
-alert("Wrong Login");
+alert("Wrong Username or Password");
 
 }
+
 </script>
 
 </body>
