@@ -49,7 +49,7 @@ background:#dc2626;
 <body>
 
 <script>
-if(localStorage.getItem("loggedIn")!="yes" || localStorage.getItem("role")!="assistant"){
+if(localStorage.getItem("session")!=="assistant"){
 location.href="admin.html";
 }
 </script>
@@ -60,17 +60,15 @@ location.href="admin.html";
 
 <div class="card">
 
-<h2>Edit Doctors</h2>
+<h2>Edit Duty</h2>
 
-<select id="doctorList" onchange="loadDoctor()"></select>
+<select id="specList"></select>
 
-<input id="docName" placeholder="Doctor Name">
+<input id="doctorName" placeholder="Doctor Name">
 
-<input id="docPhone" placeholder="Phone Number">
+<input id="doctorPhone" placeholder="Phone Number">
 
-<select id="docHospital"></select>
-
-<button onclick="saveDoctor()">Save Changes</button>
+<button onclick="saveDuty()">Save Changes</button>
 
 </div>
 
@@ -88,81 +86,44 @@ function setData(k,v){
 localStorage.setItem(k,JSON.stringify(v));
 }
 
-/* Hospitals */
-function loadHospitals(){
+const specs=[
+"Emergency Medicine","Surgery","Internal Medicine","Pediatrics",
+"Orthopedics","ENT","Ophthalmology","Urology","Cardiology",
+"Neurosurgery","Radiology","Dermatology","Gynecology",
+"Anesthesia","Psychiatry","Oncology","Nephrology",
+"Maxillofacial","Pediatric Surgery","Plastic Surgery",
+"Cardiovascular Surgery","ICU","CCU","Medicine F Ward",
+"Medicine M Ward","Surgery F Ward","Surgery M Ward",
+"Dialysis Ward","Oncology Ward","Referral Doctor",
+"Emergency Ward Rotating Resident","Evening Consultant",
+"Emergency Ward Intern Doctor"
+];
 
-let arr=getData("hospitals");
-
-docHospital.innerHTML="";
-
-arr.forEach(x=>{
-docHospital.innerHTML+=<option>${x}</option>;
+specs.forEach(x=>{
+specList.innerHTML+=<option>${x}</option>;
 });
 
-}
+function saveDuty(){
 
-/* Doctors */
-function loadDoctors(){
+let arr=getData("duties");
 
-let arr=getData("doctors");
+arr=arr.filter(x=>x.spec!==specList.value);
 
-doctorList.innerHTML="";
-
-arr.forEach(x=>{
-doctorList.innerHTML+=<option>${x.name}</option>;
+arr.push({
+spec:specList.value,
+name:doctorName.value,
+phone:doctorPhone.value
 });
 
-}
-
-function loadDoctor(){
-
-let arr=getData("doctors");
-
-let d=arr.find(x=>x.name==doctorList.value);
-
-if(!d) return;
-
-docName.value=d.name;
-docPhone.value=d.phone;
-docHospital.value=d.hospital;
-
-}
-
-function saveDoctor(){
-
-let arr=getData("doctors");
-
-let obj={
-name:docName.value,
-phone:docPhone.value,
-hospital:docHospital.value
-};
-
-arr=arr.filter(x=>x.name!=doctorList.value);
-arr.push(obj);
-
-setData("doctors",arr);
-
-loadDoctors();
+setData("duties",arr);
 
 alert("Saved");
-
 }
 
-/* Logout */
 function logout(){
-
-localStorage.removeItem("loggedIn");
-localStorage.removeItem("role");
-localStorage.removeItem("assistantName");
-
+localStorage.removeItem("session");
 location.href="admin.html";
-
 }
-
-/* Start */
-loadHospitals();
-loadDoctors();
 
 </script>
 
