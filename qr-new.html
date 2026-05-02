@@ -3,93 +3,201 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Dr Duty QR Codes</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<title>Doctor Duty</title>
 
 <style>
 body{
 margin:0;
-padding:25px;
 font-family:Arial,sans-serif;
-background:#081225;
-color:#fff;
-text-align:center;
-}
-h1{font-size:48px;margin:10px 0;}
-p{color:#bbb;font-size:22px;margin-bottom:30px;}
-.grid{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-gap:20px;
-}
-.card{
-background:#fff;
-color:#000;
-padding:18px;
-border-radius:18px;
-box-shadow:0 10px 25px rgba(0,0,0,.25);
-}
-.name{
-font-size:22px;
-font-weight:700;
-margin-bottom:15px;
-}
-.qr{
+background:#081a35;
+color:white;
 display:flex;
 justify-content:center;
-margin-bottom:12px;
+align-items:center;
+min-height:100vh;
+padding:20px;
+box-sizing:border-box;
 }
-.url{
-font-size:11px;
-word-break:break-all;
-color:#666;
+.card{
+width:100%;
+max-width:430px;
+background:#10284f;
+border-radius:22px;
+padding:25px;
+box-shadow:0 0 20px rgba(0,0,0,.35);
+text-align:center;
+}
+h1{
+margin:0 0 18px;
+font-size:28px;
+}
+h2{
+margin:0 0 20px;
+font-size:22px;
+color:#8ec5ff;
+}
+.row{
+background:#173764;
+padding:14px;
+border-radius:14px;
+margin-top:12px;
+font-size:18px;
+}
+.label{
+display:block;
+font-size:14px;
+opacity:.8;
+margin-bottom:4px;
+}
+.big{
+font-size:22px;
+font-weight:bold;
+}
+.actions{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:10px;
+margin-top:18px;
+}
+button,a.btn{
+border:none;
+text-decoration:none;
+display:flex;
+justify-content:center;
+align-items:center;
+padding:14px;
+border-radius:14px;
+font-size:17px;
+font-weight:bold;
+cursor:pointer;
+color:white;
+}
+.call{background:#16a34a;}
+.whatsapp{background:#25D366;}
+.footer{
+margin-top:16px;
+font-size:13px;
+opacity:.75;
+}
+.loading{
+font-size:18px;
+padding:20px;
 }
 </style>
 </head>
 
 <body>
 
-<h1>Dr Duty QR Codes</h1>
-<p>33 Updated Departments</p>
+<div class="card">
 
-<div class="grid" id="grid"></div>
+<div id="loading" class="loading">Loading...</div>
+
+<div id="content" style="display:none;">
+
+<h1 id="specTitle">Specialty</h1>
+
+<h2>On Duty Doctor</h2>
+
+<div class="row">
+<span class="label">Doctor Name</span>
+<div class="big" id="doctorName">-</div>
+</div>
+
+<div class="row">
+<span class="label">Phone Number</span>
+<div class="big" id="doctorPhone">-</div>
+</div>
+
+<div class="row">
+<span class="label">Hospital</span>
+<div class="big" id="doctorHospital">-</div>
+</div>
+
+<div class="actions">
+<a id="callBtn" class="btn call" href="#">Call</a>
+<a id="waBtn" class="btn whatsapp" href="#" target="_blank">WhatsApp</a>
+</div>
+
+<div class="footer" id="updatedText"></div>
+
+</div>
+
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
 <script>
-const departments = [
-"Emergency Medicine","Surgery","Internal Medicine","Pediatrics","Cardiology",
-"Orthopedic","Neurology","ENT","Ophthalmology","Dermatology","Radiology",
-"Anesthesia","ICU","Urology","Nephrology","Oncology","Psychiatry","Dental",
-"Family Medicine","Pulmonary","Gastroenterology","Endocrinology",
-"Rheumatology","Hematology","Infectious Disease","Plastic Surgery",
-"Neurosurgery","Vascular Surgery","Thoracic Surgery","Gynecology",
-"Obstetrics","Pathology","Laboratory"
-];
 
-const base = "https://drduty2026.github.io/dr-duty/index.html?spec=";
-const grid = document.getElementById("grid");
+const firebaseConfig = {
+apiKey: "AIzaSyDQqQpACfdiq-i1q-hv9auGjEkSeHhMIuc",
+authDomain: "dr-duty.firebaseapp.com",
+projectId: "dr-duty",
+storageBucket: "dr-duty.firebasestorage.app",
+messagingSenderId: "1051471488231",
+appId: "1:1051471488231:web:d9abfafee31373ec826e42"
+};
 
-departments.forEach(function(dep,i){
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
-const url = base + encodeURIComponent(dep);
-const id = "qr"+i;
+/* GET SPEC FROM URL */
+const params = new URLSearchParams(location.search);
+const spec = params.get("spec");
 
-const card = document.createElement("div");
-card.className="card";
+/* IF EMPTY */
+if(!spec){
+document.getElementById("loading").innerHTML="No specialty selected";
+}else{
 
-card.innerHTML =
-'<div class="name">'+dep+'</div>'+
-'<div class="qr" id="'+id+'"></div>'+
-'<div class="url">'+url+'</div>';
+db.collection("Duties").doc(spec).get().then(doc=>{
 
-grid.appendChild(card);
+document.getElementById("loading").style.display="none";
+document.getElementById("content").style.display="block";
 
-new QRCode(document.getElementById(id),{
-text:url,
-width:180,
-height:180
+document.getElementById("specTitle").innerText=spec;
+
+if(doc.exists){
+
+let d=doc.data();
+
+let name=d.name || "-";
+let phone=d.phone || "-";
+let hospital=d.hospital || "-";
+
+document.getElementById("doctorName").innerText=name;
+document.getElementById("doctorPhone").innerText=phone;
+document.getElementById("doctorHospital").innerText=hospital;
+
+document.getElementById("callBtn").href="tel:"+phone;
+
+let wa = phone.replace(/\D/g,'');
+
+/* IRAQ FORMAT */
+if(wa.startsWith("0")){
+wa="964"+wa.substring(1);
+}
+
+document.getElementById("waBtn").href=
+"https://wa.me/"+wa;
+
+document.getElementById("updatedText").innerText=
+"Last Updated";
+
+}else{
+
+document.getElementById("doctorName").innerText="No Data";
+document.getElementById("doctorPhone").innerText="-";
+document.getElementById("doctorHospital").innerText="-";
+document.getElementById("callBtn").style.display="none";
+document.getElementById("waBtn").style.display="none";
+
+}
+
 });
 
-});
+}
+
 </script>
 
 </body>
