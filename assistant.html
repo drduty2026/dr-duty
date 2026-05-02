@@ -40,9 +40,8 @@ background:#2563eb;
 color:white;
 font-weight:bold;
 }
-.red{
-background:#dc2626;
-}
+.green{background:#16a34a;}
+.red{background:#dc2626;}
 </style>
 </head>
 
@@ -53,7 +52,14 @@ background:#dc2626;
 <h1>Assistant Panel</h1>
 
 <div class="card">
+<h2>Add Hospital</h2>
 
+<input id="hospitalName" placeholder="Hospital Name">
+
+<button class="green" onclick="saveHospital()">Save Hospital</button>
+</div>
+
+<div class="card">
 <h2>Update Duty</h2>
 
 <select id="spec"></select>
@@ -63,7 +69,6 @@ background:#dc2626;
 <input id="doctorPhone" placeholder="Phone Number">
 
 <button onclick="saveDuty()">Save Duty</button>
-
 </div>
 
 <button class="red" onclick="logout()">Logout</button>
@@ -108,6 +113,23 @@ for(let i=0;i<arr.length;i++){
 spec.innerHTML += "<option>"+arr[i]+"</option>";
 }
 
+/* ADD HOSPITAL */
+function saveHospital(){
+
+let h = hospitalName.value.trim();
+
+if(h==="") return;
+
+db.collection("Hospitals").doc(h).set({
+name:h
+}).then(()=>{
+hospitalName.value="";
+alert("Hospital Saved");
+});
+
+}
+
+/* SAVE DUTY */
 function saveDuty(){
 
 db.collection("Duties").doc(spec.value).set({
