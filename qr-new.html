@@ -3,14 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Doctor Duty</title>
+<title>Dr Duty QR</title>
 
 <style>
 body{
 margin:0;
 font-family:Arial,sans-serif;
-background:#081a35;
-color:white;
+background:url('https://images.unsplash.com/photo-1584515933487-779824d29309?q=80&w=1200&auto=format&fit=crop') center/cover no-repeat fixed;
 display:flex;
 justify-content:center;
 align-items:center;
@@ -18,109 +17,89 @@ min-height:100vh;
 padding:20px;
 box-sizing:border-box;
 }
+.overlay{
+position:fixed;
+inset:0;
+background:rgba(0,0,0,.45);
+backdrop-filter:blur(4px);
+}
 .card{
+position:relative;
+z-index:2;
 width:100%;
 max-width:430px;
-background:#10284f;
-border-radius:22px;
-padding:25px;
-box-shadow:0 0 20px rgba(0,0,0,.35);
+padding:28px;
+border-radius:28px;
+background:rgba(255,255,255,.10);
+border:1px solid rgba(255,255,255,.18);
+backdrop-filter:blur(10px);
 text-align:center;
+color:white;
+box-sizing:border-box;
 }
 h1{
-margin:0 0 18px;
+margin:0;
+font-size:42px;
+font-weight:800;
+}
+.spec{
+margin-top:8px;
 font-size:28px;
+font-weight:700;
+color:#27d9ff;
 }
-h2{
-margin:0 0 20px;
+.phone{
+margin-top:16px;
 font-size:22px;
-color:#8ec5ff;
 }
-.row{
-background:#173764;
-padding:14px;
-border-radius:14px;
-margin-top:12px;
+.hospital{
+margin-top:10px;
 font-size:18px;
+opacity:.95;
 }
-.label{
+.btn{
 display:block;
-font-size:14px;
-opacity:.8;
-margin-bottom:4px;
-}
-.big{
-font-size:22px;
-font-weight:bold;
-}
-.actions{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:10px;
+text-decoration:none;
+color:white;
+font-size:26px;
+font-weight:700;
+padding:18px;
+border-radius:20px;
 margin-top:18px;
 }
-button,a.btn{
-border:none;
-text-decoration:none;
-display:flex;
-justify-content:center;
-align-items:center;
-padding:14px;
-border-radius:14px;
-font-size:17px;
-font-weight:bold;
-cursor:pointer;
-color:white;
+.call{
+background:linear-gradient(90deg,#0f55ff,#26d9ff);
 }
-.call{background:#16a34a;}
-.whatsapp{background:#25D366;}
-.footer{
-margin-top:16px;
-font-size:13px;
-opacity:.75;
+.whatsapp{
+background:#2cff00;
 }
-.loading{
-font-size:18px;
-padding:20px;
+.updated{
+margin-top:18px;
+font-size:16px;
+opacity:.95;
 }
 </style>
 </head>
 
 <body>
 
+<div class="overlay"></div>
+
 <div class="card">
 
-<div id="loading" class="loading">Loading...</div>
+<h1 id="doctorName">Dr_Duty</h1>
 
-<div id="content" style="display:none;">
+<div class="spec" id="specName">Loading...</div>
 
-<h1 id="specTitle">Specialty</h1>
+<div class="phone" id="phoneText">---</div>
 
-<h2>On Duty Doctor</h2>
+<div class="hospital" id="hospitalText">---</div>
 
-<div class="row">
-<span class="label">Doctor Name</span>
-<div class="big" id="doctorName">-</div>
-</div>
+<a id="callBtn" class="btn call" href="#">📞 Call</a>
 
-<div class="row">
-<span class="label">Phone Number</span>
-<div class="big" id="doctorPhone">-</div>
-</div>
+<a id="waBtn" class="btn whatsapp" href="#" target="_blank">💬 WhatsApp</a>
 
-<div class="row">
-<span class="label">Hospital</span>
-<div class="big" id="doctorHospital">-</div>
-</div>
-
-<div class="actions">
-<a id="callBtn" class="btn call" href="#">Call</a>
-<a id="waBtn" class="btn whatsapp" href="#" target="_blank">WhatsApp</a>
-</div>
-
-<div class="footer" id="updatedText"></div>
-
-</div>
+<div class="updated" id="updatedText">Updated</div>
 
 </div>
 
@@ -141,62 +120,52 @@ appId: "1:1051471488231:web:d9abfafee31373ec826e42"
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-/* GET SPEC FROM URL */
+/* GET SPEC */
 const params = new URLSearchParams(location.search);
-const spec = params.get("spec");
+const spec = params.get("spec") || "Unknown";
 
-/* IF EMPTY */
-if(!spec){
-document.getElementById("loading").innerHTML="No specialty selected";
-}else{
+specName.innerText = spec;
 
+/* LOAD DATA */
 db.collection("Duties").doc(spec).get().then(doc=>{
-
-document.getElementById("loading").style.display="none";
-document.getElementById("content").style.display="block";
-
-document.getElementById("specTitle").innerText=spec;
 
 if(doc.exists){
 
-let d=doc.data();
+let d = doc.data();
 
-let name=d.name || "-";
-let phone=d.phone || "-";
-let hospital=d.hospital || "-";
+doctorName.innerText = d.name || "Dr_Duty";
 
-document.getElementById("doctorName").innerText=name;
-document.getElementById("doctorPhone").innerText=phone;
-document.getElementById("doctorHospital").innerText=hospital;
+phoneText.innerText = d.phone || "---";
 
-document.getElementById("callBtn").href="tel:"+phone;
+hospitalText.innerText = d.hospital || "---";
 
-let wa = phone.replace(/\D/g,'');
+callBtn.href = "tel:" + (d.phone || "");
 
-/* IRAQ FORMAT */
-if(wa.startsWith("0")){
-wa="964"+wa.substring(1);
+let num = (d.phone || "").replace(/\D/g,'');
+
+if(num.startsWith("0")){
+num = "964" + num.substring(1);
 }
 
-document.getElementById("waBtn").href=
-"https://wa.me/"+wa;
+waBtn.href = "https://wa.me/" + num;
 
-document.getElementById("updatedText").innerText=
-"Last Updated";
+let now = new Date();
+
+updatedText.innerText =
+"Updated: " +
+now.getDate()+"/"+
+(now.getMonth()+1)+"/"+
+now.getFullYear();
 
 }else{
 
-document.getElementById("doctorName").innerText="No Data";
-document.getElementById("doctorPhone").innerText="-";
-document.getElementById("doctorHospital").innerText="-";
-document.getElementById("callBtn").style.display="none";
-document.getElementById("waBtn").style.display="none";
+doctorName.innerText="No Doctor";
+phoneText.innerText="---";
+hospitalText.innerText="No Hospital";
 
 }
 
 });
-
-}
 
 </script>
 
