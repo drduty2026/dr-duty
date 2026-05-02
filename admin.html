@@ -8,7 +8,7 @@
 <style>
 body{
 margin:0;
-font-family:Arial,sans-serif;
+font-family:Arial;
 background:#081a35;
 display:flex;
 justify-content:center;
@@ -22,13 +22,8 @@ max-width:420px;
 background:#10284f;
 padding:30px;
 border-radius:20px;
-box-shadow:0 0 20px rgba(0,0,0,.3);
 }
-h1{
-text-align:center;
-margin-bottom:20px;
-}
-input{
+input,button{
 width:100%;
 padding:14px;
 margin:8px 0;
@@ -38,16 +33,9 @@ font-size:17px;
 box-sizing:border-box;
 }
 button{
-width:100%;
-padding:14px;
-margin-top:10px;
-border:none;
-border-radius:10px;
 background:#2563eb;
 color:white;
-font-size:18px;
 font-weight:bold;
-cursor:pointer;
 }
 </style>
 </head>
@@ -55,24 +43,18 @@ cursor:pointer;
 <body>
 
 <div class="box">
-
 <h1>Dr Duty Login</h1>
 
 <input id="user" placeholder="Username">
 <input id="pass" type="password" placeholder="Password">
 
 <button onclick="login()">Login</button>
-
 </div>
 
-<script type="module">
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import {
-getFirestore,
-doc,
-getDoc
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+<script>
 
 const firebaseConfig = {
 apiKey: "AIzaSyDQqQpACfdiq-i1q-hv9auGjEkSeHhMIuc",
@@ -83,40 +65,36 @@ messagingSenderId: "1051471488231",
 appId: "1:1051471488231:web:d9abfafee31373ec826e42"
 };
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
-window.login = async function(){
+function login(){
 
-let u=document.getElementById("user").value.trim();
-let p=document.getElementById("pass").value.trim();
+let u=user.value.trim();
+let p=pass.value.trim();
 
-/* MAIN ADMIN */
 if(u==="admin" && p==="1234"){
 localStorage.setItem("role","admin");
 location.href="panel.html";
 return;
 }
 
-/* Assistants */
-const ref = doc(db,"Assistants",u);
-const snap = await getDoc(ref);
+db.collection("Assistants").doc(u).get().then(doc=>{
 
-if(snap.exists()){
+if(doc.exists){
 
-let data=snap.data();
+let d=doc.data();
 
-if(data.password===p && data.active===true){
-
+if(d.password===p && d.active===true){
 localStorage.setItem("role","assistant");
-localStorage.setItem("assistant",u);
-
 location.href="assistant.html";
 return;
 }
 }
 
-alert("Wrong Username or Password");
+alert("Wrong Login");
+
+});
 
 }
 
