@@ -1,85 +1,51 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Dr Duty Portal</title>
 
 <style>
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:Arial;
-}
-
 body{
-height:100vh;
+font-family:Arial;
 display:flex;
 justify-content:center;
 align-items:center;
-background:url('https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=1200&q=80') center/cover no-repeat;
-}
-
-body::before{
-content:"";
-position:fixed;
-inset:0;
-background:rgba(0,0,0,.55);
-backdrop-filter:blur(6px);
+height:100vh;
+background:#0f172a;
+color:white;
+margin:0;
 }
 
 .card{
-position:relative;
-z-index:2;
-width:92%;
-max-width:720px;
-padding:30px;
-border-radius:30px;
-background:rgba(255,255,255,.10);
-color:white;
+width:90%;
+max-width:700px;
+background:#1e293b;
+padding:25px;
+border-radius:20px;
 text-align:center;
 }
 
-h1{
-font-size:50px;
-margin-bottom:10px;
-}
-
-#specTitle{
-font-size:30px;
-color:#00e5ff;
-margin-bottom:15px;
-}
-
-#hospitalTitle{
-font-size:22px;
-margin-bottom:20px;
-}
+h1{font-size:45px;}
 
 .role{
-background:#173764;
+background:#334155;
 padding:15px;
-border-radius:15px;
 margin:10px 0;
+border-radius:15px;
 }
 
-.role b{
-font-size:20px;
-}
-
-.btn{
+a{
 display:inline-block;
-margin-top:10px;
+margin:5px;
 padding:10px 15px;
 border-radius:10px;
-color:white;
 text-decoration:none;
+color:white;
 }
 
 .call{background:#2563eb;}
 .wa{background:#16a34a;}
-
 </style>
 </head>
 
@@ -96,103 +62,4 @@ text-decoration:none;
 
 </div>
 
-<script type="module">
-
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-const firebaseConfig = {
-apiKey: "AIzaSyDQqQpACfdiq-i1q-hv9auGjEkSeHhMIuc",
-authDomain: "dr-duty.firebaseapp.com",
-projectId: "dr-duty"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-/* قراءة البيانات من الرابط */
-const params = new URLSearchParams(window.location.search);
-const spec = params.get("spec") || "Emergency Medicine";
-const hospital = params.get("hospital") || "General";
-
-/* عرض العنوان */
-document.getElementById("specTitle").innerText = spec;
-document.getElementById("hospitalTitle").innerText = hospital;
-
-/* دالة عرض الطبيب */
-function renderRole(title, role){
-
-if(!role || !role.name){
-return <div class="role">❌ ${title}: لا يوجد</div>;
-}
-
-let num = (role.phone || "").replace(/\D/g,'');
-
-if(num.startsWith("0")){
-num = "964" + num.substring(1);
-}
-
-return 
-<div class="role">
-<b>${title}</b><br>
-${role.name}<br>
-<a class="btn call" href="tel:${role.phone}">📞 اتصال</a>
-<a class="btn wa" href="https://wa.me/${num}" target="_blank">💬 واتساب</a>
-</div>
-;
-
-}
-
-/* تحميل الخفارة */
-async function loadDuty(){
-
-try{
-
-const today = new Date().getDate();
-
-/* نحاول الجدول الشهري */
-const ref = doc(db,"MonthlyDuties",hospital,spec,today.toString());
-let snap = await getDoc(ref);
-
-/* fallback للنظام القديم */
-if(!snap.exists()){
-
-const oldRef = doc(db,"Duties",spec);
-let oldSnap = await getDoc(oldRef);
-
-if(oldSnap.exists()){
-const data = oldSnap.data();
-
-document.getElementById("roles").innerHTML =
-renderRole("Doctor", {
-name:data.name,
-phone:data.phone
-});
-
-return;
-}
-
-}
-
-/* النظام الجديد */
-const data = snap.data();
-
-document.getElementById("roles").innerHTML =
-renderRole("👨‍⚕️ Specialist", data.specialist) +
-renderRole("👨‍⚕️ Senior", data.senior) +
-renderRole("👨‍⚕️ Rotator", data.rotator);
-
-}catch(e){
-
-document.getElementById("roles").innerHTML = "❌ خطأ بالتحميل";
-
-}
-
-}
-
-loadDuty();
-
-</script>
-
-</body>
-</html>
+<script src="https
