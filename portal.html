@@ -1,51 +1,150 @@
+Qr:
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Dr Duty Portal</title>
 
 <style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,Helvetica,sans-serif;
+}
+
 body{
-font-family:Arial;
+height:100vh;
 display:flex;
 justify-content:center;
 align-items:center;
-height:100vh;
-background:#0f172a;
-color:white;
-margin:0;
+background:url('https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=1200&q=80') center/cover no-repeat;
+overflow:hidden;
+}
+
+body::before{
+content:"";
+position:fixed;
+inset:0;
+background:rgba(0,0,0,.55);
+backdrop-filter:blur(6px);
 }
 
 .card{
-width:90%;
-max-width:700px;
-background:#1e293b;
-padding:25px;
-border-radius:20px;
+position:relative;
+z-index:2;
+width:92%;
+max-width:720px;
+padding:35px;
+border-radius:34px;
+background:rgba(255,255,255,.08);
+border:1px solid rgba(255,255,255,.18);
+box-shadow:0 0 35px rgba(0,255,255,.20);
 text-align:center;
-}
-
-h1{font-size:45px;}
-
-.role{
-background:#334155;
-padding:15px;
-margin:10px 0;
-border-radius:15px;
-}
-
-a{
-display:inline-block;
-margin:5px;
-padding:10px 15px;
-border-radius:10px;
-text-decoration:none;
 color:white;
+animation:fadeIn .8s ease;
 }
 
-.call{background:#2563eb;}
-.wa{background:#16a34a;}
+@keyframes fadeIn{
+from{opacity:0;transform:translateY(30px);}
+to{opacity:1;transform:translateY(0);}
+}
+
+#hospitalAr{
+font-size:44px;
+font-weight:700;
+margin-bottom:8px;
+}
+
+#hospitalEn{
+font-size:20px;
+color:#9ffcff;
+margin-bottom:24px;
+}
+
+#mainTitle{
+font-size:72px;
+font-weight:800;
+margin-bottom:10px;
+text-shadow:0 0 20px rgba(255,255,255,.25);
+}
+
+#specialtyName{
+font-size:42px;
+font-weight:700;
+color:#2ff6ff;
+margin-bottom:18px;
+}
+
+#doctorName{
+font-size:34px;
+font-weight:600;
+margin-bottom:10px;
+}
+
+#phone{
+font-size:28px;
+margin-bottom:22px;
+color:#ffffff;
+}
+
+.btn{
+display:block;
+text-decoration:none;
+padding:20px;
+margin:14px 0;
+border-radius:20px;
+font-size:34px;
+font-weight:700;
+color:white;
+transition:.25s;
+}
+
+.btn:hover{
+transform:scale(1.03);
+}
+
+.call{
+background:linear-gradient(90deg,#0051ff,#17d9ff);
+box-shadow:0 0 18px rgba(0,174,255,.35);
+}
+
+.whats{
+background:linear-gradient(90deg,#17a000,#27ff00);
+box-shadow:0 0 18px rgba(0,255,0,.28);
+}
+
+.date{
+margin-top:20px;
+font-size:22px;
+opacity:.9;
+}
+
+@media(max-width:700px){
+
+.card{
+padding:28px 22px;
+border-radius:28px;
+}
+
+#hospitalAr{font-size:30px;}
+#hospitalEn{font-size:16px;}
+#mainTitle{font-size:54px;}
+#specialtyName{font-size:30px;}
+#doctorName{font-size:24px;}
+#phone{font-size:20px;}
+
+.btn{
+font-size:26px;
+padding:18px;
+}
+
+.date{
+font-size:18px;
+}
+
+}
 </style>
 </head>
 
@@ -53,13 +152,88 @@ color:white;
 
 <div class="card">
 
-<h1>Dr_Duty</h1>
+<div id="hospitalAr">جاري التحميل...</div>
+<div id="hospitalEn"></div>
 
-<div id="specTitle"></div>
-<div id="hospitalTitle"></div>
+<div id="mainTitle">Dr_Duty</div>
 
-<div id="roles"></div>
+<div id="specialtyName">Loading...</div>
+
+<div id="doctorName"></div>
+
+<div id="phone"></div>
+
+<a id="callBtn" class="btn call" href="#">📞 Call</a>
+<a id="waBtn" class="btn whats" href="#">💬 WhatsApp</a>
+
+<div class="date" id="today"></div>
 
 </div>
 
-<script src="https
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+apiKey: "AIzaSyDQqQpACfdiq-i1q-hv9auGjEkSeHhMIuc",
+authDomain: "dr-duty.firebaseapp.com",
+projectId: "dr-duty",
+storageBucket: "dr-duty.firebasestorage.app",
+messagingSenderId: "1051471488231",
+appId: "1:1051471488231:web:d9abfafee31373ec826e42"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const params = new URLSearchParams(window.location.search);
+const spec = params.get("spec") || "Emergency Medicine";
+
+document.getElementById("specialtyName").innerText = spec;
+
+async function loadDuty(){
+
+try{
+
+const ref = doc(db,"Duties",spec);
+const snap = await getDoc(ref);
+
+if(snap.exists()){
+
+const data = snap.data();
+
+document.getElementById("hospitalAr").innerText = data.hospitalAr || "";
+document.getElementById("hospitalEn").innerText = data.hospitalEn || "";
+
+document.getElementById("doctorName").innerText = data["Doctor Name"] || "";
+document.getElementById("phone").innerText = data.phone || "";
+
+document.getElementById("callBtn").href = "tel:" + (data.phone || "");
+document.getElementById("waBtn").href = "https://wa.me/" + (data.whatsapp || "");
+
+}else{
+
+document.getElementById("hospitalAr").innerText = "لا توجد بيانات";
+
+}
+
+}catch(error){
+
+document.getElementById("hospitalAr").innerText = "خطأ بالاتصال";
+
+}
+
+}
+
+loadDuty();
+
+const d = new Date();
+
+document.getElementById("today").innerText =
+"Updated: " + d.getDate() + "/" + (d.getMonth()+1) + "/" + d.getFullYear();
+
+</script>
+
+</body>
+</html>
