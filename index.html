@@ -45,66 +45,38 @@ color:#fff;
 }
 
 h1{
-font-size:76px;
+font-size:60px;
 font-weight:800;
 margin-bottom:10px;
-text-shadow:0 0 20px rgba(255,255,255,.25);
 }
 
 .sub{
-font-size:24px;
-opacity:.95;
-margin-bottom:34px;
+font-size:20px;
+margin-bottom:20px;
 }
 
-input{
+input,select{
 width:100%;
-padding:24px;
-font-size:38px;
+padding:18px;
+font-size:20px;
 border:none;
-outline:none;
-border-radius:22px;
+border-radius:15px;
 text-align:center;
-margin-bottom:24px;
+margin-bottom:15px;
 }
 
 button{
 width:100%;
-padding:24px;
-font-size:44px;
+padding:20px;
+font-size:26px;
 font-weight:bold;
 border:none;
-border-radius:24px;
+border-radius:20px;
 cursor:pointer;
 color:#fff;
 background:linear-gradient(90deg,#2196f3,#00e5ff);
-box-shadow:0 15px 35px rgba(0,255,255,.25);
 }
 
-.note{
-margin-top:22px;
-font-size:20px;
-opacity:.9;
-}
-
-.error{
-animation:shake .3s;
-}
-
-@keyframes shake{
-0%{transform:translateX(0)}
-25%{transform:translateX(-8px)}
-50%{transform:translateX(8px)}
-75%{transform:translateX(-8px)}
-100%{transform:translateX(0)}
-}
-
-@media(max-width:700px){
-h1{font-size:62px;}
-.sub{font-size:18px;}
-input{font-size:28px;padding:20px;}
-button{font-size:34px;padding:20px;}
-}
 </style>
 </head>
 
@@ -118,44 +90,72 @@ button{font-size:34px;padding:20px;}
 
 <input type="password" id="pass" placeholder="كلمة المرور">
 
-<button onclick="login()" id="btn">دخول</button>
+<select id="hospitalSelect">
+<option disabled selected>اختر المستشفى</option>
+</select>
 
-<div class="note">Authorized Doctors Only</div>
+<button onclick="login()">دخول</button>
 
 </div>
 
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
 <script>
 
+const firebaseConfig = {
+apiKey: "AIzaSyDQqQpACfdiq-i1q-hv9auGjEkSeHhMIuc",
+authDomain: "dr-duty.firebaseapp.com",
+projectId: "dr-duty"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+/* تحميل المستشفيات */
+function loadHospitals(){
+
+hospitalSelect.innerHTML =
+'<option disabled selected>اختر المستشفى</option>';
+
+db.collection("Hospitals").get().then(snap=>{
+snap.forEach(doc=>{
+hospitalSelect.innerHTML +=
+<option value="${doc.id}">${doc.id}</option>;
+});
+});
+
+}
+
+loadHospitals();
+
+/* تسجيل الدخول */
 function login(){
 
-const password="54321";
+const password="54321dr"; // أكثر أمان
 const val=document.getElementById("pass").value.trim();
-const btn=document.getElementById("btn");
 
-if(val===password){
+if(val!==password){
+alert("كلمة المرور خطأ");
+return;
+}
+
+let hospital = hospitalSelect.value;
+
+if(!hospital){
+alert("اختار مستشفى");
+return;
+}
 
 const params=new URLSearchParams(window.location.search);
 const spec=params.get("spec") || "Emergency Medicine";
 
-window.location.href=
-"portal.html?spec="+encodeURIComponent(spec);
-
-}else{
-
-btn.classList.remove("error");
-void btn.offsetWidth;
-btn.classList.add("error");
-
-document.getElementById("pass").value="";
-document.getElementById("pass").placeholder="كلمة المرور خطأ";
+/* إرسال البيانات للصفحة التالية */
+window.location.href =
+"portal.html?spec="+encodeURIComponent(spec)+"&hospital="+encodeURIComponent(hospital);
 
 }
-
-}
-
-document.getElementById("pass").addEventListener("keypress",function(e){
-if(e.key==="Enter") login();
-});
 
 </script>
 
