@@ -1,435 +1,160 @@
-Qr:
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Dr Duty Panel</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Dr Duty Login</title>
 
 <style>
-body{
+*{
 margin:0;
-font-family:Arial;
-background:#081a35;
-color:white;
-padding:20px;
-}
-.box{
-max-width:900px;
-margin:auto;
-background:#10284f;
-padding:20px;
-border-radius:20px;
-}
-.card{
-background:#173764;
-padding:18px;
-border-radius:18px;
-margin-top:15px;
-}
-input,select,button{
-width:100%;
-padding:14px;
-margin:8px 0;
-border:none;
-border-radius:10px;
-font-size:17px;
+padding:0;
 box-sizing:border-box;
+font-family:Arial,sans-serif;
 }
+
+body{
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+background:url('https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=1200&q=80') center/cover no-repeat;
+overflow:hidden;
+}
+
+body::before{
+content:'';
+position:fixed;
+inset:0;
+background:rgba(0,0,0,.45);
+backdrop-filter:blur(6px);
+}
+
+.card{
+position:relative;
+z-index:2;
+width:92%;
+max-width:720px;
+padding:38px;
+border-radius:34px;
+background:rgba(255,255,255,.10);
+border:1px solid rgba(255,255,255,.20);
+box-shadow:0 0 35px rgba(0,255,255,.18);
+text-align:center;
+color:#fff;
+}
+
+h1{
+font-size:76px;
+font-weight:800;
+margin-bottom:10px;
+text-shadow:0 0 20px rgba(255,255,255,.25);
+}
+
+.sub{
+font-size:24px;
+opacity:.95;
+margin-bottom:34px;
+}
+
+input{
+width:100%;
+padding:24px;
+font-size:38px;
+border:none;
+outline:none;
+border-radius:22px;
+text-align:center;
+margin-bottom:24px;
+}
+
 button{
-background:#2563eb;
-color:white;
+width:100%;
+padding:24px;
+font-size:44px;
 font-weight:bold;
+border:none;
+border-radius:24px;
 cursor:pointer;
+color:#fff;
+background:linear-gradient(90deg,#2196f3,#00e5ff);
+box-shadow:0 15px 35px rgba(0,255,255,.25);
 }
-.green{background:#16a34a;}
-.red{background:#dc2626;}
+
+.note{
+margin-top:22px;
+font-size:20px;
+opacity:.9;
+}
+
+.error{
+animation:shake .3s;
+}
+
+@keyframes shake{
+0%{transform:translateX(0)}
+25%{transform:translateX(-8px)}
+50%{transform:translateX(8px)}
+75%{transform:translateX(-8px)}
+100%{transform:translateX(0)}
+}
+
+@media(max-width:700px){
+h1{font-size:62px;}
+.sub{font-size:18px;}
+input{font-size:28px;padding:20px;}
+button{font-size:34px;padding:20px;}
+}
 </style>
 </head>
 
 <body>
 
-<div class="box">
-
-<h1>Dr Duty Admin Panel</h1>
-
-<!-- Doctor Directory -->
 <div class="card">
-<h2>Doctor Directory</h2>
 
-<input id="saveDoctorName" placeholder="Doctor Name">
-<input id="saveDoctorPhone" placeholder="Phone Number">
+<h1>Dr_Duty</h1>
 
-<button class="green" onclick="saveDoctor()">Save Doctor</button>
+<div class="sub">Medical On-Call Portal</div>
 
-<select id="deleteDoctorList">
-<option value="">Select Doctor To Delete</option>
-</select>
+<input type="password" id="pass" placeholder="كلمة المرور">
 
-<button class="red" onclick="deleteDoctor()">Delete Doctor</button>
-</div>
+<button onclick="login()" id="btn">دخول</button>
 
-<!-- Add Hospital -->
-<div class="card">
-<h2>Add Hospital</h2>
-
-<input id="hospitalName" placeholder="Hospital Name">
-
-<button onclick="saveHospital()">Save Hospital</button>
-</div>
-
-<!-- Update Duty -->
-<div class="card">
-<h2>Update Duty</h2>
-
-<select id="spec"></select>
-
-<select id="savedDoctors" onchange="fillDoctor()">
-<option value="">Select Saved Doctor</option>
-</select>
-
-<input id="doctorName" placeholder="Doctor Name">
-<input id="doctorPhone" placeholder="Phone Number">
-
-<select id="hospitalList"></select>
-
-<button onclick="saveDuty()">Save Duty</button>
-</div>
-
-<!-- Add Assistant -->
-<div class="card">
-<h2>Add Assistant</h2>
-
-<input id="auser" placeholder="Username">
-<input id="apass" placeholder="Password">
-
-<button class="green" onclick="saveAssistant()">Save Assistant</button>
-</div>
-
-<!-- Assistant Manager -->
-<div class="card">
-<h2>Assistants Manager</h2>
-
-<p id="assistantCount">Assistants: 0</p>
-
-<select id="assistantList"></select>
-
-<button class="red" onclick="deleteAssistant()">Delete Assistant</button>
-</div>
-
-<!-- Admin Security -->
-<div class="card">
-<h2>Admin Security</h2>
-
-<input id="newAdminUser" placeholder="New Username">
-<input id="newAdminPass" placeholder="New Password">
-
-<button class="green" onclick="changeAdminLogin()">Save Changes</button>
-</div>
-
-<button class="red" onclick="logout()">Logout</button>
+<div class="note">Authorized Doctors Only</div>
 
 </div>
-
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
 <script>
 
-if(localStorage.getItem("role")!=="admin"){
-location.href="admin.html";
-}
+function login(){
 
-const firebaseConfig = {
-apiKey:"AIzaSyDQqQpACfdiq-i1q-hv9auGjEkSeHhMIuc",
-authDomain:"dr-duty.firebaseapp.com",
-projectId:"dr-duty",
-storageBucket:"dr-duty.firebasestorage.app",
-messagingSenderId:"1051471488231",
-appId:"1:1051471488231:web:d9abfafee31373ec826e42"
-};
+const password="54321";
+const val=document.getElementById("pass").value.trim();
+const btn=document.getElementById("btn");
 
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
+if(val===password){
 
-/* Specialties */
-const arr = [
-"Emergency Medicine","Surgery","Internal Medicine","Pediatrics",
-"Orthopedics","ENT","Ophthalmology","Urology","Cardiology",
-"Neurosurgery","Radiology","Dermatology","Gynecology",
-"Anesthesia","Psychiatry","Oncology","Nephrology",
-"Maxillofacial","Pediatric Surgery","Plastic Surgery",
-"Cardiovascular Surgery","ICU","CCU","Medicine F Ward",
-"Medicine M Ward","Surgery F Ward","Surgery M Ward",
-"Dialysis Ward","Oncology Ward","Referral Doctor",
-"Emergency Ward Rotating Resident","Evening Consultant",
-"Emergency Ward Intern Doctor","Family medicine"
-];
+const params=new URLSearchParams(window.location.search);
+const spec=params.get("spec") || "Emergency Medicine";
 
-for(let i=0;i<arr.length;i++){
-spec.innerHTML += "<option>"+arr[i]+"</option>";
-}
+window.location.href=
+"portal.html?spec="+encodeURIComponent(spec);
 
-/* Save Doctor */
-function saveDoctor(){
+}else{
 
-let n=saveDoctorName.value.trim();
-let p=saveDoctorPhone.value.trim();
+btn.classList.remove("error");
+void btn.offsetWidth;
+btn.classList.add("error");
 
-if(n==="") return;
-
-db.collection("Doctors").doc(n).set({
-name:n,
-phone:p
-}).then(()=>{
-
-alert("Doctor Saved");
-
-saveDoctorName.value="";
-saveDoctorPhone.value="";
-
-loadDoctors();
-loadDeleteDoctors();
-
-});
+document.getElementById("pass").value="";
+document.getElementById("pass").placeholder="كلمة المرور خطأ";
 
 }
 
-/* Load Doctors */
-function loadDoctors(){
-
-savedDoctors.innerHTML =
-'<option value="">Select Saved Doctor</option>';
-
-db.collection("Doctors").get().then(snap=>{
-
-snap.forEach(doc=>{
-
-savedDoctors.innerHTML +=
-'<option value="'+doc.id+'">'+doc.id+'</option>';
-
-});
-
-});
-
 }
 
-/* Fill Doctor */
-function fillDoctor(){
-
-let n=savedDoctors.value;
-if(n==="") return;
-
-db.collection("Doctors").doc(n).get().then(doc=>{
-
-if(doc.exists){
-
-doctorName.value=doc.data().name;
-doctorPhone.value=doc.data().phone;
-
-}
-
-});
-
-}
-
-/* Delete Doctor List */
-function loadDeleteDoctors(){
-
-deleteDoctorList.innerHTML =
-'<option value="">Select Doctor To Delete</option>';
-
-db.collection("Doctors").get().then(snap=>{
-
-snap.forEach(doc=>{
-
-deleteDoctorList.innerHTML +=
-'<option value="'+doc.id+'">'+doc.id+'</option>';
-
-});
-
-});
-
-}
-
-/* Delete Doctor */
-function deleteDoctor(){
-
-let n=deleteDoctorList.value;
-
-if(n===""){
-alert("Select Doctor");
-return;
-}
-
-if(!confirm("Delete "+n+" ?")) return;
-
-db.collection("Doctors").doc(n).delete().then(()=>{
-
-alert("Doctor Deleted");
-
-loadDoctors();
-loadDeleteDoctors();
-
-});
-
-}
-
-/* Hospitals */
-function loadHospitals(){
-
-hospitalList.innerHTML="";
-
-db.collection("Hospitals").get().then(snap=>{
-
-snap.forEach(doc=>{
-hospitalList.innerHTML +=
-"<option>"+doc.id+"</option>";
-});
-
-});
-
-}
-
-function saveHospital(){
-
-let h=hospitalName.value.trim();
-
-if(h==="") return;
-
-db.collection("Hospitals").doc(h).set({
-name:h
-}).then(()=>{
-
-alert("Hospital Saved");
-hospitalName.value="";
-loadHospitals();
-
-});
-
-}
-
-/* Duty */
-function saveDuty(){
-
-db.collection("Duties").doc(spec.value).set({
-spec:spec.value,
-name:doctorName.value,
-phone:doctorPhone.value,
-hospital:hospitalList.value
-}).then(()=>{
-
-alert("Duty Saved");
-
-});
-
-}
-
-/* Assistants */
-function saveAssistant(){
-
-db.collection("Assistants").doc(auser.value).set({
-username:auser.value,
-password:apass.value,
-active:true
-}).then(()=>{
-
-alert("Assistant Saved");
-
-auser.value="";
-apass.value="";
-
-loadAssistants();
-
-});
-
-}
-
-function loadAssistants(){
-
-assistantList.innerHTML="";
-
-db.collection("Assistants").get().then(snap=>{
-
-assistantCount.innerHTML =
-"Assistants: "+snap.size;
-
-snap.forEach(doc=>{
-
-assistantList.innerHTML +=
-"<option>"+doc.id+"</option>";
-
-});
-
-});
-
-}
-
-function deleteAssistant(){
-
-let u=assistantList.value;
-
-if(!u) return;
-
-db.collection("Assistants").doc(u).delete().then(()=>{
-
-alert("Assistant Deleted");
-loadAssistants();
-
-});
-
-}
-
-/* Admin Security */
-function changeAdminLogin(){
-
-let u=newAdminUser.value.trim();
-let p=newAdminPass.value.trim();
-
-if(u==="" || p===""){
-alert("Enter Username + Password");
-return;
-}
-
-db.collection("Admins").doc("main").set({
-username:u,
-password:p
-}).then(()=>{
-
-alert("Admin Updated");
-
-newAdminUser.value="";
-newAdminPass.value="";
-
-});
-
-}
-
-/* Logout */
-function logout(){
-
-localStorage.removeItem("role");
-location.href="admin.html";
-
-}
-
-/* Start */
-loadDoctors();
-loadDeleteDoctors();
-loadHospitals();
-loadAssistants();
-
-db.collection("Admins").doc("main").get().then(doc=>{
-
-if(!doc.exists){
-
-db.collection("Admins").doc("main").set({
-username:"admin",
-password:"1234"
-});
-
-}
-
+document.getElementById("pass").addEventListener("keypress",function(e){
+if(e.key==="Enter") login();
 });
 
 </script>
