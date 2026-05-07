@@ -356,4 +356,15 @@ data.hospital;
 document.getElementById("callBtn")
 .onclick = function(){
 
-window.location
+window.location.href =
+`tel:${data.phone}`;
+
+};
+
+document.getElementById("whatsappBtn")
+.onclick = function(){
+
+window.location.href =
+`https://wa.me/964${data.phone}`;
+
+};
