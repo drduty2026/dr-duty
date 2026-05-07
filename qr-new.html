@@ -75,10 +75,35 @@
 
         const data = doc.data();
 
-        if (
-          data.specialty === specialty &&
-          data.hospital === hospital
-        ) {
+       const dbSpec =
+  data.specialty
+      .toLowerCase()
+      .trim();
+
+const qrSpec =
+  specialty
+      .toLowerCase()
+      .trim();
+
+const dbHospital =
+  data.hospital
+      .toLowerCase()
+      .trim();
+
+const selectedHospital =
+  hospital
+      .toLowerCase()
+      .trim();
+
+if (
+
+  dbSpec.includes(qrSpec) &&
+
+  dbHospital.includes(
+    selectedHospital
+  )
+
+)
 
           found = true;
 
