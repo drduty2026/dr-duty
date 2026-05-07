@@ -356,8 +356,11 @@ data.hospital;
 document.getElementById("callBtn")
 .onclick = function(){
 
+const iraqPhone =
+"964" + data.phone.substring(1);
+
 window.location.href =
-`tel:${data.phone}`;
+`https://wa.me/${iraqPhone}`;
 
 };
 
