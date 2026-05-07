@@ -3,8 +3,8 @@
 
 <head>
 
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>DR DUTY</title>
 
@@ -25,7 +25,6 @@ body{
     display:flex;
     justify-content:center;
     align-items:center;
-    flex-direction:column;
 }
 
 .box{
@@ -49,7 +48,7 @@ h1{
     margin-bottom:25px;
 }
 
-select,input{
+input,select{
     width:100%;
     padding:15px;
     border:none;
@@ -84,30 +83,34 @@ button{
     color:white;
 }
 
+#hospitalBox{
+    display:none;
+}
+
 #doctorBox{
     display:none;
 }
 
 .doctorName{
-    font-size:42px;
+    font-size:38px;
     font-weight:bold;
 }
 
 .spec{
     color:#00d2ff;
-    font-size:28px;
+    font-size:26px;
     margin-top:10px;
 }
 
 .phone{
-    font-size:24px;
     margin-top:10px;
+    font-size:22px;
 }
 
 .hospital{
     margin-top:10px;
     color:#dddddd;
-    font-size:20px;
+    font-size:18px;
 }
 
 </style>
@@ -141,11 +144,7 @@ Login
 
 </div>
 
-<div
-class="box"
-id="hospitalBox"
-style="display:none;"
->
+<div class="box" id="hospitalBox">
 
 <h1>Select</h1>
 
@@ -199,26 +198,22 @@ Continue
 <div
 class="doctorName"
 id="doctorName"
->
-</div>
+></div>
 
 <div
 class="spec"
 id="doctorSpecialty"
->
-</div>
+></div>
 
 <div
 class="phone"
 id="doctorPhone"
->
-</div>
+></div>
 
 <div
 class="hospital"
 id="doctorHospital"
->
-</div>
+></div>
 
 <button
 class="callBtn"
@@ -238,15 +233,11 @@ id="whatsappBtn"
 
 </div>
 
-<script type="module">
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
-import {
-getFirestore,
-collection,
-getDocs
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+<script>
 
 const firebaseConfig = {
 
@@ -264,11 +255,11 @@ appId: "1:1051471488231:web:d9abfafee31373ec826e42"
 
 };
 
-const app = initializeApp(firebaseConfig);
+firebase.initializeApp(firebaseConfig);
 
-const db = getFirestore(app);
+const db = firebase.firestore();
 
-window.login = function(){
+function login(){
 
 const pass =
 document.getElementById("password").value;
@@ -289,7 +280,7 @@ alert("Wrong Password");
 
 }
 
-window.loadDoctor = async function(){
+async function loadDoctor(){
 
 const hospital =
 document.getElementById("hospital")
@@ -302,7 +293,7 @@ const specialty =
 params.get("spec");
 
 const querySnapshot =
-await getDocs(collection(db,"duty_doctors"));
+await db.collection("duty_doctors").get();
 
 let found = false;
 
@@ -363,7 +354,7 @@ document.getElementById("doctorHospital")
 data.hospital;
 
 document.getElementById("callBtn")
-.onclick = ()=>{
+.onclick = function(){
 
 window.location.href =
 `tel:${data.phone}`;
@@ -371,7 +362,7 @@ window.location.href =
 };
 
 document.getElementById("whatsappBtn")
-.onclick = ()=>{
+.onclick = function(){
 
 window.location.href =
 `https://wa.me/${data.phone}`;
@@ -393,4 +384,5 @@ alert("No Doctor Found");
 </script>
 
 </body>
+
 </html>
