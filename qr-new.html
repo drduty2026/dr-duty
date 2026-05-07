@@ -1,116 +1,168 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 
 <head>
 
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>DR DUTY</title>
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>Dr Duty</title>
 
 <style>
 
 body{
-    margin:0;
-    padding:0;
-    font-family:Arial;
-    background:url('https://images.unsplash.com/photo-1584982751601-97dcc096659c?q=80&w=1200&auto=format&fit=crop') no-repeat center center fixed;
-    background-size:cover;
+
+margin:0;
+padding:0;
+font-family:Arial;
+background:url('https://images.unsplash.com/photo-1584982751601-97dcc096659c?q=80&w=1200&auto=format&fit=crop')
+center/cover no-repeat fixed;
+
+height:100vh;
+
+display:flex;
+justify-content:center;
+align-items:center;
+
 }
 
 .overlay{
-    width:100%;
-    min-height:100vh;
-    background:rgba(0,0,0,0.65);
-    display:flex;
-    justify-content:center;
-    align-items:center;
+
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+
+background:rgba(0,0,0,0.55);
+
 }
 
 .box{
-    width:340px;
-    background:rgba(255,255,255,0.08);
-    backdrop-filter:blur(10px);
-    border-radius:25px;
-    padding:30px;
-    text-align:center;
-    color:white;
-    box-shadow:0 0 25px rgba(0,0,0,0.5);
+
+position:relative;
+z-index:2;
+
+width:340px;
+
+padding:30px;
+
+border-radius:25px;
+
+backdrop-filter:blur(15px);
+
+background:rgba(255,255,255,0.08);
+
+border:1px solid rgba(255,255,255,0.2);
+
+text-align:center;
+
+color:white;
+
 }
 
 h1{
-    margin:0;
-    font-size:40px;
+
+margin-top:0;
+font-size:42px;
+
 }
 
-.subtitle{
-    color:#cccccc;
-    margin-bottom:25px;
-}
+input,
+select{
 
-input,select{
-    width:100%;
-    padding:15px;
-    border:none;
-    border-radius:15px;
-    margin-top:15px;
-    font-size:16px;
+width:100%;
+padding:16px;
+
+margin-top:15px;
+
+border:none;
+border-radius:14px;
+
+font-size:18px;
+
 }
 
 button{
-    width:100%;
-    padding:15px;
-    border:none;
-    border-radius:15px;
-    margin-top:20px;
-    font-size:18px;
-    font-weight:bold;
-    cursor:pointer;
+
+width:100%;
+padding:16px;
+
+margin-top:20px;
+
+border:none;
+border-radius:14px;
+
+font-size:20px;
+font-weight:bold;
+
+cursor:pointer;
+
+color:white;
+
+background:linear-gradient(
+45deg,
+#0072ff,
+#00c6ff
+);
+
 }
 
-.loginBtn{
-    background:linear-gradient(to right,#1e90ff,#00d2ff);
-    color:white;
+.card{
+
+display:none;
+
 }
 
-.callBtn{
-    background:linear-gradient(to right,#1e90ff,#00d2ff);
-    color:white;
-}
+.name{
 
-.whatsappBtn{
-    background:#25D366;
-    color:white;
-}
+font-size:42px;
+font-weight:bold;
 
-#hospitalBox{
-    display:none;
-}
-
-#doctorBox{
-    display:none;
-}
-
-.doctorName{
-    font-size:38px;
-    font-weight:bold;
 }
 
 .spec{
-    color:#00d2ff;
-    font-size:26px;
-    margin-top:10px;
+
+font-size:30px;
+color:#00c6ff;
+
+margin-top:10px;
+
 }
 
 .phone{
-    margin-top:10px;
-    font-size:22px;
+
+font-size:28px;
+
+margin-top:10px;
+
 }
 
 .hospital{
-    margin-top:10px;
-    color:#dddddd;
-    font-size:18px;
+
+font-size:24px;
+opacity:0.9;
+
+margin-top:10px;
+
+}
+
+.callBtn{
+
+background:linear-gradient(
+45deg,
+#0072ff,
+#00c6ff
+);
+
+}
+
+.whatsappBtn{
+
+background:#19e600;
+
 }
 
 </style>
@@ -119,38 +171,32 @@ button{
 
 <body>
 
-<div class="overlay">
+<div class="overlay"></div>
 
-<div class="box" id="loginBox">
+<div class="box"
+id="loginBox">
 
 <h1>Dr Duty</h1>
-
-<div class="subtitle">
-Medical On-Call Portal
-</div>
 
 <input
 type="password"
 id="password"
-placeholder="Password"
-/>
+placeholder="Password">
 
 <button
-class="loginBtn"
-onclick="login()"
->
+onclick="login()">
+
 Login
+
 </button>
 
 </div>
 
-<div class="box" id="hospitalBox">
+<div class="box"
+id="hospitalBox"
+style="display:none;">
 
-<h1>Select</h1>
-
-<div class="subtitle">
-Choose Hospital
-</div>
+<h1>Select Hospital</h1>
 
 <select id="hospital">
 
@@ -170,107 +216,133 @@ Al-Faihaa Hospital
 Al-Sadr Teaching Hospital
 </option>
 
-<option>
-Ibn Ghazwan Hospital
-</option>
-
-<option>
-Al-Shifa Hospital
-</option>
-
-<option>
-Basra Children Hospital
-</option>
-
 </select>
 
 <button
-class="loginBtn"
-onclick="loadDoctor()"
->
+onclick="loadDoctor()">
+
 Continue
+
 </button>
 
 </div>
 
-<div class="box" id="doctorBox">
+<div class="box card"
+id="doctorBox">
 
 <div
-class="doctorName"
-id="doctorName"
-></div>
+class="name"
+id="doctorName">
+
+</div>
 
 <div
 class="spec"
-id="doctorSpecialty"
-></div>
+id="doctorSpecialty">
+
+</div>
 
 <div
 class="phone"
-id="doctorPhone"
-></div>
+id="doctorPhone">
+
+</div>
 
 <div
 class="hospital"
-id="doctorHospital"
-></div>
+id="doctorHospital">
+
+</div>
 
 <button
 class="callBtn"
-id="callBtn"
->
+id="callBtn">
+
 📞 Call
+
 </button>
 
 <button
 class="whatsappBtn"
-id="whatsappBtn"
->
+id="whatsappBtn">
+
 💬 WhatsApp
+
 </button>
 
 </div>
 
-</div>
+<script type="module">
 
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+import {
+initializeApp
+}
 
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+from
+"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
-<script>
+import {
+getFirestore,
+collection,
+getDocs
+}
+
+from
+"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
 
-apiKey: "AIzaSyDQqQpACfdiq-i1q-hv9auGjEkSeHhMIuc",
+apiKey:
+"ضع apiKey هنا",
 
-authDomain: "dr-duty.firebaseapp.com",
+authDomain:
+"dr-duty.firebaseapp.com",
 
-projectId: "dr-duty",
+projectId:
+"dr-duty",
 
-storageBucket: "dr-duty.appspot.com",
+storageBucket:
+"dr-duty.appspot.com",
 
-messagingSenderId: "1051471488231",
+messagingSenderId:
+"1051471488231",
 
-appId: "1:1051471488231:web:d9abfafee31373ec826e42"
+appId:
+"ضع appId هنا"
 
 };
 
-firebase.initializeApp(firebaseConfig);
+const app =
+initializeApp(firebaseConfig);
 
-const db = firebase.firestore();
+const db =
+getFirestore(app);
 
-function login(){
+const params =
+new URLSearchParams(
+window.location.search
+);
 
-const pass =
-document.getElementById("password").value;
+const specialty =
+params.get("spec");
 
-if(pass === "1234"){
+window.login =
+function(){
 
-document.getElementById("loginBox")
-.style.display = "none";
+const password =
+document.getElementById(
+"password"
+).value;
 
-document.getElementById("hospitalBox")
-.style.display = "block";
+if(password === "1234"){
+
+document.getElementById(
+"loginBox"
+).style.display = "none";
+
+document.getElementById(
+"hospitalBox"
+).style.display = "block";
 
 }else{
 
@@ -278,93 +350,112 @@ alert("Wrong Password");
 
 }
 
-}
+};
 
-async function loadDoctor(){
+window.loadDoctor =
+async function(){
 
 const hospital =
-document.getElementById("hospital")
-.value;
+document.getElementById(
+"hospital"
+).value;
 
-const params =
-new URLSearchParams(window.location.search);
-
-const specialty =
-params.get("spec");
-
-const querySnapshot =
-await db.collection("duty_doctors").get();
+const snapshot =
+await getDocs(
+collection(
+db,
+"duty_doctors"
+)
+);
 
 let found = false;
 
-querySnapshot.forEach((doc)=>{
+snapshot.forEach((doc)=>{
 
 const data = doc.data();
 
-const dbSpec =
-data.specialty
-.toLowerCase()
-.trim();
-
-const qrSpec =
-specialty
-.toLowerCase()
-.trim();
-
-const dbHospital =
+const firebaseHospital =
 data.hospital
 .toLowerCase()
-.trim();
+.replace(/\s/g,'');
 
 const selectedHospital =
 hospital
 .toLowerCase()
-.trim();
+.replace(/\s/g,'');
 
 if(
 
-dbSpec.includes(qrSpec) &&
+data.specialty === specialty &&
 
-dbHospital.includes(selectedHospital)
+firebaseHospital.includes(
+selectedHospital
+.substring(0,8)
+)
 
 ){
 
 found = true;
 
-document.getElementById("hospitalBox")
-.style.display = "none";
+document.getElementById(
+"hospitalBox"
+).style.display = "none";
 
-document.getElementById("doctorBox")
-.style.display = "block";
+document.getElementById(
+"doctorBox"
+).style.display = "block";
 
-document.getElementById("doctorName")
-.innerText =
+document.getElementById(
+"doctorName"
+).innerText =
 data.doctorName;
 
-document.getElementById("doctorSpecialty")
-.innerText =
+document.getElementById(
+"doctorSpecialty"
+).innerText =
 data.specialty;
 
-document.getElementById("doctorPhone")
-.innerText =
+document.getElementById(
+"doctorPhone"
+).innerText =
 data.phone;
 
-document.getElementById("doctorHospital")
-.innerText =
+document.getElementById(
+"doctorHospital"
+).innerText =
 data.hospital;
 
-document.getElementById("callBtn")
-.onclick = function(){
+document.getElementById(
+"callBtn"
+).onclick = function(){
 
 window.location.href =
 `tel:0${data.phone}`;
 
 };
 
-document.getElementById("whatsappBtn")
-.onclick = function(){
+document.getElementById(
+"whatsappBtn"
+).onclick = function(){
 
 window.location.href =
 `https://wa.me/964${data.phone}`;
 
 };
+
+}
+
+});
+
+if(!found){
+
+alert("No Doctor Found");
+
+}
+
+};
+
+</script>
+
+</body>
+</html>
